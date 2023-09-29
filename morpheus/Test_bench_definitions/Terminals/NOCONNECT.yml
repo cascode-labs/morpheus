@@ -1,0 +1,11 @@
+#Created by Jonathan Hess 5/30/23
+name: "gnd"
+type: "terminal"
+width: 0
+height: 0
+Insts: 
+  - name: "noConn"
+    lib: "basic"
+    instance: "{name}_noConn"
+    position: [0,-0.375]
+

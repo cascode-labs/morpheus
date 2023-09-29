@@ -1,0 +1,14 @@
+#Created by Jonathan Hess 5/30/23
+name: "gnd"
+type: "terminal"
+width: 0.5
+height: 1
+Insts: 
+  - name: "gnd"
+    lib: "analogLib"
+    instance: "{name}_gnd"
+    position: [0,-0.375]
+
+  - name: "wire"
+    label: "{name}"
+    position: [[0,0],[0,-0.375]]

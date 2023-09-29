@@ -1,0 +1,31 @@
+#named by Jonathan Timm
+#Created by Jonathan Hess 5/31/23
+name: "RC"
+type: "terminal"
+width: 0.5
+height: 2
+Insts:
+  - name: "cap"
+    lib: "analogLib"
+    instance: "{name}_cap"
+    position: [0,0]
+    parameters:
+      "c": "{name}"
+    
+  - name: "gnd"
+    lib: "analogLib"
+    instance: "{name}_gnd"
+    position: [0,-0.375]
+    
+  - name: "res"
+    instance: "{name}res"
+    lib: "analogLib"
+    position: [0,0.5]
+    parameters:
+      "r": "{name}"
+  - name: "wire"
+    position: [[0,0],[0,0.5]]
+
+  - name: "wire"
+    label: "{name}"
+    position: [[0,0.5],[0,1]]

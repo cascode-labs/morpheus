@@ -1,0 +1,79 @@
+
+printf("\nInitializing Morpheus\n")
+let((Morpheus
+    (module_description "Testbench Generator Script")
+    (Module VrtImport['Module])
+    (Module VrtImport['Virtue])
+    (Path VrtImport['Path]))
+   
+    Morpheus = let(()
+
+        procedure(start_gui()
+            let((USER PROJ)
+            USER = getShellEnvVar("USER")
+            PROJ = getShellEnvVar("PROJ")
+            id = strcat(PROJ,"_",USER) ; ID FOR PROJECT (MAY NEED MORE FOR )
+            pyStartServer(?id id) ;Need to set the id
+
+            run_command = sprintf(nil,"/rds/prod/HOTCODE/amslibs/oa614/cdsware/IDS/morpheus/latest/bin/morpheus --id %s &", id)
+            RunTerminalGui(run_command "Starting Morpheus GUI")
+            )
+        )
+
+        procedure(RunTerminalGui(command @optional (title "running command") "tt")
+            "Opens a terminal and runs the specified command.  It will give it the specified title"
+            system(strcat(
+            "gnome-terminal --window -t \"" title "\""
+            " -e \"tcsh -c \\\"" command 
+            " && echo '\\nPress any key to close'"
+            " && read\\\"\""))
+        )
+
+        procedure(CCSrunUnixScript( commandName scriptPath @optional (outputFile 
+        "default.txt") (options "")(displayFile nil) "ttgg" )
+            let(( runCommand msgHandler errHandler childId ip nextline)
+                if(isFile(scriptPath) == t then
+                    if(isExecutable(scriptPath) == t then
+                        runCommand = strcat(commandName " " scriptPath " > " 
+                        outputFile "" options )
+                        printf("Running Unix/Linux command\n$prompt> %s\n" runCommand)
+                        msgHandler = lambda( (cid data) printf("\n[Msg 
+                        CCSrunUnixScript: %s]\n%s" cid data))
+                        errHandler = lambda( (cid data) printf("\n[Err 
+                        CCSrunUnixScript: %s]\n%s" cid data))
+                        childId = ipcBeginProcess(runCommand "" 'msgHandler 
+                        'errHandler)
+                        ipcWait(childId)
+                        if(displayFile == t then
+                            view(outputFile)
+                        else
+                            ip=infile(outputFile)
+                            when(ip
+                                while( gets(nextline ip)
+                                    printf("%L\n" car(parseString(nextline "\n")))
+                                ) ;while
+                            )
+                            close(ip) 
+                            t
+                        )
+                        else
+                        warn("Input Script %s doesn't have Executable 
+                        Permissions.\n" scriptPath)
+                    ); if
+                    else
+                      warn("Input Script %s doesn't exist in system.\n" scriptPath)
+                )
+            )
+        )
+
+        list(nil
+        'start_gui start_gui
+        'CCSrunUnixScript CCSrunUnixScript
+        )
+    )
+
+    Morpheus = Module->New('Morpheus
+                                ?module Morpheus
+                                ?description module_description)
+)
+printf("Initialized Morpheus\n")
