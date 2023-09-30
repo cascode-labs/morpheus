@@ -1,0 +1,20 @@
+name: "OPAMP"
+type: "terminal"
+
+Terminals:
+  
+  - name: "negative"
+    term: "dc"
+    pattern: ""
+    region: 0
+
+  - name: "postive"
+    term: "dc"
+    pattern: ""
+    region: 0
+
+  - name: "output"
+   term: "dc"
+    pattern: ""
+    region: 0
+

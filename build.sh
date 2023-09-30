@@ -2,11 +2,13 @@
 PROJECT="morpheus"
 VERSION=$(cat version)
 DIST_PATH="dist/v$VERSION"
+conda activate morpheus
 echo "Building ${PROJECT} v$VERSION"
 rm -rf "$DIST_PATH"
 mkdir -p "$DIST_PATH"
 
 # Executable
+mkdir -p "$DIST_PATH/bin"
 python3 -m PyInstaller morpheus/__main__.py \
   --name morpheus \
   --onefile \
@@ -18,6 +20,9 @@ python3 -m PyInstaller morpheus/__main__.py \
 # SKILL
 cp -rf skill "$DIST_PATH/"
 find "$DIST_PATH/skill" -name ".skillide.*" -delete
+
+#Configs
+echo "  copy testbench configs to $DIST_PATH"
 cp -rf morpheus/Test_bench_definitions "$DIST_PATH/"
 
 # Python package
