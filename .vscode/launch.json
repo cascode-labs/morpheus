@@ -8,7 +8,7 @@
             "name": "Python: Schematic Test",
             "type": "python",
             "request": "launch",
-            "program": "morpheus/tests/schematictest.py",
+            "program": "tests/schematictest.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
@@ -17,6 +17,14 @@
             "type": "python",
             "request": "launch",
             "module": "morpheus",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Module no GUI",
+            "type": "python",
+            "request": "launch",
+            "module": "morpheus",
+            "args": ["--nograph"],
             "justMyCode": true
         }
     ]

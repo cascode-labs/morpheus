@@ -22,7 +22,8 @@ class schematic:
         self.terminals = dict()
         self.instances = dict()
         self.evaluatedPins = list()
-        self.config.Build = list()
+        if(hasattr(self.config,"Build")):
+            self.config.Build = list()
 
     def reevaluate(self, pins):
         self.evaluatedPins = pins

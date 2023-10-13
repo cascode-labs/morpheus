@@ -1,2 +1,3 @@
 SOFTINCLUDE /home/jehess/cds.lib
 DEFINE morpheus /home/jehess/morpheus/tests/morpheus
+DEFINE morpheus_tests /home/jehess/morpheus/tests/morpheus_tests
