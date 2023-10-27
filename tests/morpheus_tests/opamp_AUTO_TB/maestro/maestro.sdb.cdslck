@@ -11,6 +11,6 @@ ProcessCreationTime_UTC        1698426480
 ProcessCreationTime_Readable   Fri Oct 27 12:08:00 2023 CDT
 AppIdentifier                  /usr/local/cadence/ic/tools/dfII/bin/64bit/virtuoso
 OSType                         lnx86
-ReasonForPlacingEditLock       Lock file for generating unique number for ICRP command and log file directories.
-FilePathUsedToEditLock         /home/jehess/morpheus/tests/.tmp_jehess/.unique_number_0_file
+ReasonForPlacingEditLock       
+FilePathUsedToEditLock         /home/jehess/morpheus/tests/morpheus_tests/opamp_AUTO_TB/maestro/maestro.sdb
 TimeEditLocked                 Fri Oct 27 12:08:19 2023 CDT

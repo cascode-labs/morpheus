@@ -4,6 +4,10 @@
 *.il~
 tests/lint_reports
 
+#Cadence
+tests/.tmp*
+tests/logs_*
+morpheus/tests/.cadence/dfII/history/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -134,4 +138,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-morpheus/tests/.cadence/dfII/history/

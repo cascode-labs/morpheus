@@ -2,9 +2,9 @@
 from skillbridge import Workspace
 import sys
 import os.path
-from morpheus.Maestro import maestro
 parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parentddir)
+from morpheus.Maestro import maestro
 from morpheus.Schematic import schematic
 from morpheus import Config
 from morpheus import *
@@ -12,7 +12,7 @@ from morpheus import *
 id = "test"
 lib = "morpheus_tests"
 DUT = "iopamp"
-configFile = "Schematics/opamp.yml"
+configFile = "Tests/opamp.yml"
 tconfig = None
 
 ws = Workspace.open(id)

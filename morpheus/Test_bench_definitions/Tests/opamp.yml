@@ -7,11 +7,11 @@ type: "test"
 schematic: opamp
 
 variables:
-  - name: "{VDD}"
+  - name: "VDD"
     test: [Global,TEST1,TEST2]
     value: -3.8
 
-  - name: "{VCC}"
+  - name: "VCC"
     test: [Global,TEST1,TEST2]
     value: 3.8
 
@@ -27,5 +27,8 @@ tests:
           - [incrType, Automatic]
     equations:
     - name: "EQUATION_1"
-      type: "VDD"
-      equation: value(IS("/V_{VDD}/MINUS") 27)
+      type: "vdd"
+      equation: value(IS("/V_{vdd}/MINUS") 27)
+    corners:
+      - name: corner1
+      - name: corner2 

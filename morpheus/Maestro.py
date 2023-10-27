@@ -31,7 +31,7 @@ class maestro:
     def getSchematic(self,test):
         schem = self.schematics.get(test.schematic)
         if(schem is None): #doesnt exist
-            sconfig = config("Schematics/{filename}.yml".format(filename = test.name)) #TODO UPDATE TO SEARCH FOLDERS
+            sconfig = config("Schematics/{filename}.yml".format(filename = test.schematic)) #TODO UPDATE TO SEARCH FOLDERS
             schem = schematic(self.ws,self.lib,self.DUT,sconfig,test)
             schem.evaluate()
             #
@@ -102,9 +102,13 @@ class maestro:
     def createEquation(self, test, equation):
         
         self.createEquDict(test,equation)
-
-        name = equation.name.format(**self.equationDict)
-        self.ws.mae.AddOutput(name,test.name, session = self.session,expr = equation.equation.format(**self.equationDict))
+        try:
+            name = equation.name.format(**self.equationDict)
+            expression = equation.equation.format(**self.equationDict)
+            self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)
+        except:
+            print("no pins of type", equation.type)
+        
 
     def createSignals(self,test):
         for signal in test.signals: #create all requred signals
@@ -117,7 +121,7 @@ class maestro:
         
         self.ws.mae.AddOutput(signal.name,test.name, session = self.session,outputType ="net",signalName = signal.signal.format(**self.equationDict))
 
-    def createEquDict(self,test, data):
+    def createEquDict(self,test, data):#TODO add pins despite if none
         pins_of_type = [pin for pin in test.schem.evaluatedPins if pin.type == data.type]
         for pin in pins_of_type:
             self.equationDict.update({data.type: pin.label})

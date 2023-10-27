@@ -14,6 +14,14 @@
             "justMyCode": true
         },
         {
+            "name": "Python: Maestro Test",
+            "type": "python",
+            "request": "launch",
+            "program": "tests/maestrotests.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Python: Module",
             "type": "python",
             "request": "launch",
