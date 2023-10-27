@@ -114,6 +114,8 @@ def main(morph_args: list | None = None):
     except ValueError:
         index = len(morph_args)
     args = parser.parse_args(morph_args[:index])
+    
+    print(args.command)
     try:
         cell= args.cell
     except:

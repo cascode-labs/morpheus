@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: Schematic Test",
             "type": "python",
@@ -26,6 +27,15 @@
             "module": "morpheus",
             "args": ["--nograph"],
             "justMyCode": true
-        }
+        },
+        {
+            "name": "Python: Module schematic test",
+            "type": "python",
+            "request": "launch",
+            "module": "morpheus",
+            "args": ["schematic","--nograph"],
+            "justMyCode": true
+        },
+        
     ]
 }

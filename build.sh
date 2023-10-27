@@ -23,7 +23,7 @@ find "$DIST_PATH/skill" -name ".skillide.*" -delete
 
 #Configs
 echo "  copy testbench configs to $DIST_PATH"
-cp -rf morpheus/Test_bench_definitions "$DIST_PATH/"
+cp -rf morpheus/Test_bench_definitions "$DIST_PATH/bin/"
 
 # Python package
 flit build

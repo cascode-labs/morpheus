@@ -17,5 +17,6 @@ cadence = subprocess.Popen(["virtuoso", "-nograph"],stdin=subprocess.PIPE,stdout
 file_path = skillbridge.__file__
 dir = os.path.dirname(file_path)
 command = dir + "server/python_server.il" #server location
-
+#/home/jehess/miniforge3/envs/morpheus/  lib/python3.11/site-packages/skillbridge/server/python_server.il
+#/home/jehess/miniforge3/envs/morpheus/bin/python/lib/python3.11/site-packages/skillbridge/server/python_server.il"
 #cadence.stdin.write(b"load('/home/jehess/miniforge3/envs/morpheus/lib/python3.11/site-packages/skillbridge/server/python_server.il')")

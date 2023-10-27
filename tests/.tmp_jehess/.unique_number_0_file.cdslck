@@ -1,0 +1,16 @@
+#
+# Edit Lock-Stake file. CAUTION: Please do not change.
+#
+# Information about current Edit Lock Owner.
+#
+LockStakeVersion               1.1
+LoginName                      jehess
+HostName                       linuxvdi-40.ece.iastate.edu
+ProcessIdentifier              12027
+ProcessCreationTime_UTC        1697212052
+ProcessCreationTime_Readable   Fri Oct 13 10:47:32 2023 CDT
+AppIdentifier                  /usr/local/cadence/ic/tools/dfII/bin/64bit/virtuoso
+OSType                         lnx86
+ReasonForPlacingEditLock       Lock file for generating unique number for ICRP command and log file directories.
+FilePathUsedToEditLock         /home/jehess/morpheus/tests/.tmp_jehess/.unique_number_0_file
+TimeEditLocked                 Fri Oct 13 15:00:34 2023 CDT

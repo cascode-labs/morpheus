@@ -1,0 +1,31 @@
+name: "opamp_test"
+type: "test"
+
+#scriptpath: '/PATH/TO/SKILL/SCRIPT'
+#script: "SCRIPTNAME"
+
+schematic: opamp
+
+variables:
+  - name: "{VDD}"
+    test: [Global,TEST1,TEST2]
+    value: -3.8
+
+  - name: "{VCC}"
+    test: [Global,TEST1,TEST2]
+    value: 3.8
+
+tests:
+  - name: "TEST1"
+    analysis:
+        type: "dc"
+        options: 
+          - [sweep, Temperature]
+          - [rangeType, Start-Stop]
+          - [start, "-40"]
+          - [stop, "125"]
+          - [incrType, Automatic]
+    equations:
+    - name: "EQUATION_1"
+      type: "VDD"
+      equation: value(IS("/V_{VDD}/MINUS") 27)

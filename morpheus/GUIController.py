@@ -17,15 +17,18 @@ class GUIController():
         self.GUIframe = GUIViewer(None,wx.ID_ANY, "")
         self.id = id
         self.libList = None
-        self.cellList = None
+        self.cellList = None    
 
         self.testPins = []
         self.schems = []
-
-        try:
-            self.ws = Workspace.open(self.id) #open skillbridge
-        except Exception as e:
-            self.error(e)
+        #print("id is ", self.id)
+        self.ws = Workspace.open(self.id) #open skillbridge
+        #try:
+        #    print("create ws")
+       #     self.ws = Workspace.open(self.id) #open skillbridge
+        #except Exception as e:
+        #    print("failed to create ws")
+        #    self.error(e)
 
 
     def startGUI(self):
@@ -55,7 +58,7 @@ class GUIController():
 
     def populateTests(self):
         
-        Files = os.listdir('morpheus/Test_bench_definitions/Tests')
+        Files = os.listdir('Test_bench_definitions/Tests') #TODO add check for user directories
 
         tests = []
         for test in Files:

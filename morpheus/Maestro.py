@@ -2,7 +2,7 @@ from morpheus.Config import *
 from morpheus.Schematic import *
 
 class maestro:
-    def __init__(self,ws,lib,DUT) -> None:
+    def __init__(self,ws,lib,DUT,test = None) -> None:
         self.DUT = DUT
         self.ws = ws
         self.lib = lib
@@ -14,6 +14,9 @@ class maestro:
 
         self.open() #TODO delete? become part of GUI Handler
         self.schematics = dict()
+        if(test):
+            schem = self.getSchematic(test) #TODO should run in create test not before
+            self.createTest(test,schem)
 
 
     @staticmethod
@@ -28,7 +31,7 @@ class maestro:
     def getSchematic(self,test):
         schem = self.schematics.get(test.schematic)
         if(schem is None): #doesnt exist
-            sconfig = config("Schematics/{filename}.yml".format(filename = test.name))
+            sconfig = config("Schematics/{filename}.yml".format(filename = test.name)) #TODO UPDATE TO SEARCH FOLDERS
             schem = schematic(self.ws,self.lib,self.DUT,sconfig,test)
             schem.evaluate()
             #
@@ -48,7 +51,7 @@ class maestro:
 
     def createTest(self,Config,schem):
         
-        for test in Config.tests:
+        for test in Config.tests: #create all tests in maestro view
             setattr(test,"schem",schem)
             self.ws.mae.CreateTest(test.name, session = self.session, # Create Test within Maestro
                                    lib = self.lib, cell = self.cell, view = "config_" + Config.name)
@@ -58,12 +61,18 @@ class maestro:
 
             self.x_mainSDB = self.ws.axl.GetMainSetupDB( self.session )
 
-            self.ws.sev.AddExpression(self.session,"ocean","")
-            #self.createCorners(test)
-            self.createSignals(test)
-            self.createEquations(test)
+            self.ws.sev.AddExpression(self.session,"ocean","") #ocean scripts broken
+            
+            if(hasattr(test,"corners")): #add corners if present
+                self.createCorners(test)
+                
+            if(hasattr(test,"signals")):
+                self.createSignals(test)
+                
+            if(hasattr(test,"equations")):   
+                self.createEquations(test)
             #self.addOceanScripts(test)
-
+            
         for var in Config.variables:
             
             self.ws.mae.SetVar(var.name.format(**self.equationDict),var.value,typeValue=var.test, #Attach varaibles to Maestro view
@@ -74,7 +83,10 @@ class maestro:
         self.close()
 
 
-
+    def createCorners(self, test):
+        for corner in test.corners: #create all corners for maestro view
+            self.createCorner(corner)
+    
     def createCorner(self,corner): #TODO Not finished
         #if(self.PWL):
         filepath = "default"
