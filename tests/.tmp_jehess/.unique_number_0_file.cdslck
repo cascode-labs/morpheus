@@ -5,12 +5,12 @@
 #
 LockStakeVersion               1.1
 LoginName                      jehess
-HostName                       linuxvdi-15.ece.iastate.edu
-ProcessIdentifier              14356
-ProcessCreationTime_UTC        1698426480
-ProcessCreationTime_Readable   Fri Oct 27 12:08:00 2023 CDT
+HostName                       linux-4.ece.iastate.edu
+ProcessIdentifier              2514106
+ProcessCreationTime_UTC        1698436103
+ProcessCreationTime_Readable   Fri Oct 27 14:48:23 2023 CDT
 AppIdentifier                  /usr/local/cadence/ic/tools/dfII/bin/64bit/virtuoso
 OSType                         lnx86
 ReasonForPlacingEditLock       Lock file for generating unique number for ICRP command and log file directories.
 FilePathUsedToEditLock         /home/jehess/morpheus/tests/.tmp_jehess/.unique_number_0_file
-TimeEditLocked                 Fri Oct 27 12:08:19 2023 CDT
+TimeEditLocked                 Fri Oct 27 20:09:28 2023 CDT

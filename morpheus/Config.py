@@ -30,3 +30,35 @@ class config:
 
             self.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
             print(self.name +" " + self.type +" loaded")#TODO set this to use {} stuff
+
+
+
+user_home = os.path.expanduser('~')
+morpheus_home =  os.path.join(user_home,"morpheus")
+#path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))
+
+class config_loader:
+    
+    schem_configs = dict()
+    test_configs = dict()
+    term_config = dict()
+    
+    
+    def getPathLocations():
+        try:
+            config(os.path.join(morpheus_home,"user.yml"))
+        except:
+            print("no user yml file")
+        path_locations
+    
+    def findConfigFiles():
+        pass
+    #.schem
+    def getSchematicConfig():
+        pass
+    #.test
+    def getTestConfig(configName):
+        pass
+    #.term
+    def getTerminal():
+        pass

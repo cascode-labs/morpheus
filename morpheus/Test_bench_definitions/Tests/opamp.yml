@@ -31,4 +31,5 @@ tests:
       equation: value(IS("/V_{vdd}/MINUS") 27)
     corners:
       - name: corner1
-      - name: corner2 
+      - name: corner2
+  

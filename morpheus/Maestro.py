@@ -53,8 +53,9 @@ class maestro:
         
         for test in Config.tests: #create all tests in maestro view
             setattr(test,"schem",schem)
+            print("create test {test}\n".format( test= test.name))
             self.ws.mae.CreateTest(test.name, session = self.session, # Create Test within Maestro
-                                   lib = self.lib, cell = self.cell, view = "config_" + Config.name)
+                                   lib = self.lib, cell = self.cell, view = test.schem.view)
             
             self.ws.mae.SetAnalysis(test.name, test.analysis.type , #Add Test Analysis within Maestro
                                     session = self.session, options = test.analysis.options)
@@ -137,7 +138,7 @@ class maestro:
     
     def open(self):
         self.session = self.ws.mae.OpenSetup(self.lib, self.cell,"maestro") #create new maestro view
-        
     def close(self):
         self.ws.mae.SaveSetup(session = self.session)
         self.ws.mae.CloseSession(session = self.session)
+

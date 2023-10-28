@@ -13,7 +13,7 @@ Terminals:
   - name: "vdd"
     type: "vdd"
     term: "dc"
-    pattern: "vdd"
+    pattern: "vdd|vcc"
     region: 0
 
   - name: "postive"

@@ -1,3 +1,7 @@
+# File Created by jehess at Fri Oct 27 13:58:00 2023
+# assisted by CdsLibEditor
 SOFTINCLUDE /home/jehess/cds.lib
-DEFINE morpheus /home/jehess/morpheus/tests/morpheus
 DEFINE morpheus_tests /home/jehess/morpheus/tests/morpheus_tests
+
+DEFINE analogLib $(inst_root_with:tools/dfII/bin/virtuoso)/tools/dfII/etc/cdslib/artist/analogLib
+DEFINE basic $(inst_root_with:tools/dfII/bin/virtuoso)/tools/dfII/etc/cdslib/basic

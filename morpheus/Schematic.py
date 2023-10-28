@@ -27,8 +27,8 @@ class schematic:
 
     def reevaluate(self, pins):
         self.evaluatedPins = pins
-
         cvid = self.ws.dd.GetObj(self.lib,self.DUT.cell_name + "_AUTO_TB","schematic_" + self.config.name) #delete
+        
         #self.maestro.createEquations()
 
         self.ws.dd.DeleteObj(cvid) #delete
@@ -157,6 +157,7 @@ class schematic:
 
         print("Building!")
         #create cell view for schematic
+        self.view = "schematic_" + self.config.name #TODO standarize this to set in init
         cv = self.ws.db.OpenCellViewByType(self.lib, self.DUT.cell_name + "_AUTO_TB","schematic_" + self.config.name, "schematic", "w")
         if(cv is None): #TODO CREATION EXCEPTIONS
             print("Error: Schematic not found. Check if open elsewhere")
