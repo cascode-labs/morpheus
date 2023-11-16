@@ -12,13 +12,13 @@ from morpheus import *
 id = "test"
 lib = "morpheus_tests"
 DUT = "iopamp"
-configFile = "Tests/opamp.yml"
+configFile = "opamp.yml"
 tconfig = None
 
 ws = Workspace.open(id)
 
 DUT = ws.db.open_cell_view("morpheus_tests","opamp","symbol")
-configFile = Config.config(configFile)
+configFile = Config.config(configFile,Config.config_types.TEST)
 Testbench = maestro(ws,lib,DUT,test = configFile)
 #session = maeOpenSetup("morpheus_tests" "opamp_AUTO_TB" "maestro_test") 
 #maeCreateTest("firstTest" ?session session ?lib "morpheus_tests" ?cell "opamp_AUTO_TB" ?view "maestro_test")

@@ -1,3 +1,4 @@
+from enum import Enum
 import yaml
 import os
 from yaml.loader import UnsafeLoader
@@ -22,43 +23,69 @@ class obj(object):
                 setattr(self, k, [obj(x) if isinstance(x, dict) else x for x in v])
             else:
                 setattr(self, k, obj(v) if isinstance(v, dict) else v)
+class config_types(Enum):
+    TERMINAL = 1
+    SCHEMATIC = 2
+    TEST = 3
+    SYSTEM = 4
+config_dict_types = {
+    "terminal": config_types.TERMINAL,
+    "schematic": config_types.SCHEMATIC,
+    "test": config_types.TEST,
+    "system": config_types.SYSTEM
+}
 class config:
-    def __init__(self,filename):
-        print("reading "+ filename)
-        filename = os.path.join(script_dir, "Test_bench_definitions/" + filename)
-        with open(filename, 'r') as file:
+    path_locations = list()
+    userConfig = None
+    types = dict()
+    def __init__(self,filename,file_type):
 
-            self.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
-            print(self.name +" " + self.type +" loaded")#TODO set this to use {} stuff
-
-
-
-user_home = os.path.expanduser('~')
-morpheus_home =  os.path.join(user_home,"morpheus")
-#path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))
-
-class config_loader:
+        if(len(config.path_locations) == 0):
+            config.getPaths()
+        #filename = os.path.join(script_dir, "Test_bench_definitions/" + filename)
+        #try
+        print("Finding "+ filename)
+        for path in config.path_locations:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    if file == filename:
+                        filepath = os.path.join(root, file)
+                        try:
+                            with open(filepath, 'r') as file:
+                                #data = yaml.safe_load(file) #cleaner solution?
+                                self.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
+                                if config_dict_types[self.type] != file_type:
+                                    continue
+                                print(f"{self.name} {self.type} loaded from {filepath}")
+                                return
+                        except Exception as e:
+                            print(f"Error loading {filename}: {e}")
+        print("Could not find "+ filename + " in paths");
+        #except:
+        #    print("failed to load")
+    def parseType(input):
+        config_types[input];
+        
+        return type;    
     
-    schem_configs = dict()
-    test_configs = dict()
-    term_config = dict()
-    
-    
-    def getPathLocations():
+    def getPaths():
+        script_dir = os.path.dirname(__file__)
+        user_home = os.path.expanduser('~')
+        morpheus_home =  os.path.join(user_home,"morpheus")
+        
+        config.path_locations.append(os.path.join(script_dir, "Test_bench_definitions"))
+        config.path_locations.append(morpheus_home)
         try:
-            config(os.path.join(morpheus_home,"user.yml"))
-        except:
-            print("no user yml file")
-        path_locations
-    
-    def findConfigFiles():
-        pass
-    #.schem
-    def getSchematicConfig():
-        pass
-    #.test
-    def getTestConfig(configName):
-        pass
-    #.term
-    def getTerminal():
-        pass
+            config.userConfig = config("user.yml",config_types.SYSTEM)
+            for path in config.userConfig.paths: #add all user's paths to path locations
+                config.path_locations.append(path)
+        except FileNotFoundError:
+            #TODO create new config file for user
+            pass
+    def addPath(directory):
+        [x[0] for x in os.walk(directory)]
+        for subdir in x:
+            addPath()
+            config.path_locations.append()
+
+#path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))

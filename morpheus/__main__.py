@@ -94,13 +94,6 @@ def generate_parser() -> _MorphArgumentParser:
 
     return parser
 
-script_dir = os.path.dirname(__file__)
-user_home = os.path.expanduser('~')
-morpheus_home =  os.path.join(user_home,"morpheus")
-path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))
-
-config(os.path.join(morpheus_home,"user.yml"))
-    
 
 
 def main(morph_args: list | None = None):
@@ -142,6 +135,7 @@ def main(morph_args: list | None = None):
     
 
     if not args.nograph:
+        config.getPaths()#Get paths for tests
         Controller = GUIController(id)
         Controller.startGUI()
 main()

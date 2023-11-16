@@ -22,12 +22,20 @@ class schematic:
         self.terminals = dict()
         self.instances = dict()
         self.evaluatedPins = list()
+        self.cell = self.DUT.cell_name + "_AUTO_TB"
         if(hasattr(self.config,"Build")):
             self.config.Build = list()
+        #set schematic view name
+        if(hasattr(self.config,"name")):
+            self.view = self.config.name
+        else:
+            self.view = "schematic_" + self.DUT.cell_name 
+                
 
     def reevaluate(self, pins):
         self.evaluatedPins = pins
-        cvid = self.ws.dd.GetObj(self.lib,self.DUT.cell_name + "_AUTO_TB","schematic_" + self.config.name) #delete
+
+        cvid = self.ws.dd.GetObj(self.lib,self.cell,self.view) #delete
         
         #self.maestro.createEquations()
 
@@ -48,7 +56,7 @@ class schematic:
         terminal = self.terminals.get(term_type.term)
  
         if terminal is None:
-            terminal = config("Terminals/" + term_type.term + ".yml")
+            terminal = config(term_type.term,config_types.TERMINAL)
             self.terminals.update({term_type.term:terminal})
 
         
@@ -157,8 +165,8 @@ class schematic:
 
         print("Building!")
         #create cell view for schematic
-        self.view = "schematic_" + self.config.name #TODO standarize this to set in init
-        cv = self.ws.db.OpenCellViewByType(self.lib, self.DUT.cell_name + "_AUTO_TB","schematic_" + self.config.name, "schematic", "w")
+        #self.view = "schematic_" + self.config.name #TODO standarize this to set in init
+        cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
         if(cv is None): #TODO CREATION EXCEPTIONS
             print("Error: Schematic not found. Check if open elsewhere")
             return

@@ -31,7 +31,7 @@ class maestro:
     def getSchematic(self,test):
         schem = self.schematics.get(test.schematic)
         if(schem is None): #doesnt exist
-            sconfig = config("Schematics/{filename}.yml".format(filename = test.schematic)) #TODO UPDATE TO SEARCH FOLDERS
+            sconfig = config("{filename}.yml".format(filename = test.schematic),config_types.SCHEMATIC)
             schem = schematic(self.ws,self.lib,self.DUT,sconfig,test)
             schem.evaluate()
             #
@@ -88,15 +88,13 @@ class maestro:
         for corner in test.corners: #create all corners for maestro view
             self.createCorner(corner)
     
-    def createCorner(self,corner): #TODO Not finished
+    def createCorner(self,corner):
         #if(self.PWL):
-        filepath = "default"
         newCorner = self.ws.axl.PutCorner(self.x_mainSDB, corner.name)
         #ADD ALL CORNER VARIABLES
-        self.ws.axl.PutVar(newCorner, "DATA_path", filepath)# ADD DATA FILE PATH
-        self.ws.axl.PutVar(newCorner, "CLK_path", filepath)# ADD DATA FILE PATH
-        self.ws.axl.PutVar(newCorner, "VIO_path", filepath)# ADD DATA FILE PATH
-
+        for var in corner.vars:
+            self.ws.axl.PutVar(newCorner, var.name, var.value)
+            
     def createEquations(self, test):
         for equation in test.equations:
             self.createEquation(test, equation)

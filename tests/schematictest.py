@@ -15,7 +15,7 @@ from morpheus import *
 id = "test"
 lib = "morpheus_tests"
 DUT = "iopamp"
-configFile = "Schematics/opamp.yml"
+configFile = "opamp.yml"
 tconfig = None
 
 
@@ -25,7 +25,7 @@ from subprocess import Popen, PIPE
 ws = Workspace.open(id)
 
 DUT = ws.db.open_cell_view("morpheus_tests","opamp","symbol")
-configFile = Config.config(configFile)
+configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
 Testbench = schematic(ws,lib,DUT,configFile, tconfig)
 Testbench.evaluate();
 Testbench.plan();

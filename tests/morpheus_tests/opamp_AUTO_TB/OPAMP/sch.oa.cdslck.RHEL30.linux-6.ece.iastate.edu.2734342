@@ -1,0 +1,16 @@
+#
+# Edit Lock-Stake file. CAUTION: Please do not change.
+#
+# Information about current Edit Lock Owner.
+#
+LockStakeVersion               1.1
+LoginName                      jehess
+HostName                       linux-6.ece.iastate.edu
+ProcessIdentifier              2734342
+ProcessCreationTime_UTC        1700112388
+ProcessCreationTime_Readable   Wed Nov 15 23:26:28 2023 CST
+AppIdentifier                  OA File System Design Manager
+OSType                         unix
+ReasonForPlacingEditLock       OpenAccess edit lock
+FilePathUsedToEditLock         /home/jehess/morpheus/tests/morpheus_tests/opamp_AUTO_TB/OPAMP/sch.oa.cdslck.dirlck
+TimeEditLocked                 Thu Nov 16 00:19:45 2023 CST

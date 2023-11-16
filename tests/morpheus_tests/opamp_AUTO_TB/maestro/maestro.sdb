@@ -32,30 +32,9 @@
 			</corner>
 		</corners>
 		<currentmode>Single Run, Sweeps and Corners</currentmode>
-		<vars>
-			<var>VDD
-				<value>-3.8</value>
-				<dependentTests>
-					<dependentTest omitted="0">TEST1</dependentTest>
-				</dependentTests>
-			</var>
-			<var>VCC
-				<value>3.8</value>
-				<dependentTests>
-					<dependentTest omitted="0">TEST1</dependentTest>
-				</dependentTests>
-			</var>
-		</vars>
-		<extensions>
-			<extension>Parasitics
-				<callback>_parSetupDBExtensionCB</callback>
-				<iconvalue></iconvalue>
-				<icontype></icontype>
-			</extension>
-		</extensions>
 		<overwritehistory>0</overwritehistory>
 		<tests>
-			<test enabled="1">TEST1
+			<test>TEST1
 				<tool>ADE</tool>
 				<tooloptions>
 					<option>cell
@@ -68,7 +47,7 @@
 						<value>spectre</value>
 					</option>
 					<option>view
-						<value>schematic_OPAMP</value>
+						<value>OPAMP</value>
 					</option>
 					<option>path
 						<value>$AXL_SETUPDB_DIR</value>
@@ -87,20 +66,20 @@
 				</vars>
 			</test>
 		</tests>
-		<disabledtests></disabledtests>
-		<checksasserts netlist="0">
-			<test netlist="0" netlistscope="all">morpheus_tests_opamp_AUTO_TB_1</test>
-		</checksasserts>
-		<plottingoptions>
-			<plottingoption>waveformtemplate
-				<value>(None)</value>
-			</plottingoption>
-		</plottingoptions>
-		<exploreroptions>
-			<exploreroption>waveformtemplate
-				<value>(None)</value>
-			</exploreroption>
-		</exploreroptions>
+		<vars>
+			<var>VDD
+				<value>-3.8</value>
+				<dependentTests>
+					<dependentTest omitted="0">TEST1</dependentTest>
+				</dependentTests>
+			</var>
+			<var>VCC
+				<value>3.8</value>
+				<dependentTests>
+					<dependentTest omitted="0">TEST1</dependentTest>
+				</dependentTests>
+			</var>
+		</vars>
 	</active>
 	<history>History</history>
 </setupdb>

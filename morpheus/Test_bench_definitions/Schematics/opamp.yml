@@ -1,5 +1,5 @@
 name: "OPAMP"
-type: "terminal"
+type: "schematic"
 
 Terminals:
   - name: "vss"

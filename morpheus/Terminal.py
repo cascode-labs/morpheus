@@ -1,5 +1,5 @@
 from morpheus.Config import config
-
+from morpheus.Config import config_types
 
 class Terminal:
     terminals = dict()
@@ -80,7 +80,7 @@ class Terminal:
         terminal = Terminal.terminals.get(term_type.term)
  
         if terminal is None:
-            terminal = config("Terminals/" + term_type.term + ".yml")
+            terminal = config(term_type.term + ".yml", config_types.TERMINAL)
             Terminal.terminals.update({term_type.term:terminal})
 
         return terminal
