@@ -1,7 +1,7 @@
 from morpheus.Exceptions.ExceptionHandler import MorpheusExceptionHandler
 
 from skillbridge import Workspace
-from morpheus.Config import config
+from morpheus.Config import config, config_types
 from morpheus.Maestro import maestro
 from morpheus.GUIViewer import *
 from morpheus.TabTemplate import TabTemplate
@@ -58,11 +58,15 @@ class GUIController():
 
     def populateTests(self):
         
-        Files = os.listdir('Test_bench_definitions/Tests') #TODO add check for user directories
-
-        tests = []
-        for test in Files:
-            tests.append(test[0:(len(test)-4)])
+        #Files = os.listdir('Test_bench_definitions/Tests') #TODO add check for user directories
+        Files = config.getConfigs(config_types.TEST)
+        tests = list()
+        for file in Files:
+            tests.append(file.name)
+        
+        
+        #for test in Files:
+        #    tests.append(test[0:(len(test)-4)])
 
         self.GUIframe.sel_test.AppendItems(tests)
 

@@ -26,6 +26,7 @@
             "type": "python",
             "request": "launch",
             "module": "morpheus",
+            "args": ["--id", "test"],
             "justMyCode": true
         },
         {

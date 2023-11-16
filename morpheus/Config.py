@@ -38,8 +38,9 @@ class config:
     path_locations = list()
     userConfig = None
     types = dict()
-    def __init__(self,filename,file_type):
-
+    def __init__(self,filename=None,file_type=None):
+        if(filename == None):
+            return
         if(len(config.path_locations) == 0):
             config.getPaths()
         #filename = os.path.join(script_dir, "Test_bench_definitions/" + filename)
@@ -82,10 +83,24 @@ class config:
         except FileNotFoundError:
             #TODO create new config file for user
             pass
-    def addPath(directory):
-        [x[0] for x in os.walk(directory)]
-        for subdir in x:
-            addPath()
-            config.path_locations.append()
+        
+    def getConfigs(file_type):
+        configs = list()
+        config_temp = config()
+        for path in config.path_locations:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    if(os.path.splitext(file)[1] == ".yml" ):
+                        filepath = os.path.join(root, file)
+                        try:
+                            with open(filepath, 'r') as file:
+                                #data = yaml.safe_load(file) #cleaner solution?
+                                config_temp.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
+                                if config_dict_types[config_temp.type] != file_type:
+                                    continue
+                                configs.append(config_temp);
+                        except Exception as e:
+                            print(f"Error loading {filepath}: {e}")
+        return configs
 
 #path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))
