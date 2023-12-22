@@ -8,6 +8,11 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added Config file searching
+- Added ability to add extra paths 
+- Added user.yml in ~/.morpheus
+- Added unix options, schematic, adddir, removedir, and maestro
 
 ## [0.1.0] - 2023-08-16
 
