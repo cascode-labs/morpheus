@@ -35,14 +35,14 @@
             "request": "launch",
             "module": "morpheus",
             "args": ["--nograph"],
-            "justMyCode": true
+            "justMyCode": false
         },
         {
             "name": "Python: Module schematic test",
             "type": "python",
             "request": "launch",
             "module": "morpheus",
-            "args": ["schematic","--nograph"],
+            "args": ["schematic","--dutlib","morpheus_tests","--id", "test"],//,"--DUTCELL", "opamp","--lib","morpheus_tests","--config","opamp.yml"],
             "justMyCode": true
         },
         

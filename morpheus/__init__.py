@@ -7,4 +7,4 @@ from morpheus import Config
 print("morpheus init")
 script_dir = os.path.dirname(__file__)
 user_home = os.path.expanduser('~')
-morpheus_home =  os.path.join(user_home,"morpheus")
+morpheus_home =  os.path.join(user_home,".morpheus")

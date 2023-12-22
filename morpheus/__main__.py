@@ -1,14 +1,17 @@
 import argparse
-from morpheus import UnixOptions
+from skillbridge import Workspace
+
+#from morpheus import UnixOptions
 from morpheus.GUIController import *
 from morpheus.Schematic import *
 
-from morpheus import __version__
+
 import os
 
 from collections import defaultdict
 
-
+from morpheus.UnixOptions import UnixOptions
+from morpheus.UnixCommands import UnixCommands
 
 
 #borrowed and modified from pyinstaller
@@ -86,9 +89,12 @@ def generate_parser() -> _MorphArgumentParser:
 
     parser = _MorphArgumentParser(formatter_class=_SmartFormatter)
     parser.prog = "morpheus"
+    #subparsers = parser.add_subparsers(dest='command')
 
-    parser._add_options(__add_options)
-    parser._add_options(UnixOptions.__add_options, name="schematic")
+    UnixOptions.add_morpheus_options(parser)
+    #schematic_parser = subparsers.add_parser('schematic')
+    #UnixOptions.add_schematic_options(schematic_parser)
+
 
 
 
@@ -97,6 +103,8 @@ def generate_parser() -> _MorphArgumentParser:
 
 
 def main(morph_args: list | None = None):
+
+    #old parser code
     parser = argparse.ArgumentParser(
                     prog='Morpheus',
                     description='Testbench Generator',
@@ -107,7 +115,9 @@ def main(morph_args: list | None = None):
 
     #args = parser.parse_args()
 
-    #new parser
+
+
+    #new parser code
     parser = generate_parser()
     if morph_args is None:
             morph_args = sys.argv[1:]
@@ -115,10 +125,12 @@ def main(morph_args: list | None = None):
         index = morph_args.index("--")
     except ValueError:
         index = len(morph_args)
+    
     args = parser.parse_args(morph_args[:index])
     
     print(args.command)
-    try:
+
+    try: #try catch should not be needed because of default values
         cell= args.cell
     except:
         cell = ""
@@ -127,12 +139,16 @@ def main(morph_args: list | None = None):
     except:
         lib = ""
         
+    id = args.id
+    #TODO try id and select new ID if already used
+    #create cadence instance
     try:
-        id = args.id
+        ws = Workspace.open(id) #create ws in main rather than in GUI or elsewhere
+        UnixCommands(ws,args)
     except:
-        id = os.getenv("USER")
+        pass
     
-    
+   
 
     if not args.nograph:
         config.getPaths()#Get paths for tests
