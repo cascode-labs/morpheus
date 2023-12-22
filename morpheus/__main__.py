@@ -150,7 +150,7 @@ def main(morph_args: list | None = None):
     
    
 
-    if not args.nograph:
+    if not args.nograph and not args.command:
         config.getPaths()#Get paths for tests
         Controller = GUIController(id)
         Controller.startGUI()

@@ -17,7 +17,7 @@ def UnixCommands(ws,args):
     if(args.command == "schematic"):
         #add check for all required args
         tconfig = None
-        DUT = ws.db.open_cell_view(args.DUTLIB,args.DUTCELL,"symbol")
+        DUT = ws.db.open_cell_view(args.DUTlib,args.DUTcell,"symbol")
         configFile = Config.config(args.config,Config.config_types.SCHEMATIC)
         Testbench = schematic(ws,args.lib,DUT,configFile, tconfig)
         Testbench.evaluate();
@@ -26,6 +26,6 @@ def UnixCommands(ws,args):
     
     if(args.command == "maestro"):
         tconfig = None
-        DUT = ws.db.open_cell_view(args.DUTLIB,args.DUTCELL,"symbol")
+        DUT = ws.db.open_cell_view(args.DUTlib,args.DUTcell,"symbol")
         configFile = Config.config(args.config,Config.config_types.TEST)
         Testbench = maestro(ws,args.lib,DUT,test = configFile)

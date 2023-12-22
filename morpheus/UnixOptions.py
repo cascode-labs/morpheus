@@ -8,6 +8,7 @@ class UnixOptions:
         #Add the command option
         parser.add_argument("command",
             nargs='?',
+            default=None,
             help="command used by morpheus",
             type=str)
         parser.add_argument("arg1",
@@ -54,14 +55,14 @@ class UnixOptions:
 
         #DUT commands
         parser.add_argument(
-            "--dutlib",
+            "--DUTlib",
             metavar="DUTLIB",
             default="",
             help="The library that contains the DUT cell in cadence"
         )
 
         parser.add_argument(
-            "--DUTCELL",
+            "--DUTcell",
             metavar="DUTCell",
             default="",
             help="The cell for the DUT in cadence.",

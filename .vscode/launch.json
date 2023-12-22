@@ -42,7 +42,7 @@
             "type": "python",
             "request": "launch",
             "module": "morpheus",
-            "args": ["schematic","--dutlib","morpheus_tests","--id", "test"],//,"--DUTCELL", "opamp","--lib","morpheus_tests","--config","opamp.yml"],
+            "args": ["schematic","--DUTlib","morpheus_tests","--id", "test","--DUTcell", "opamp","--lib","morpheus_tests","--config","opamp.yml"],
             "justMyCode": true
         },
         
