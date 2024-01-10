@@ -31,10 +31,10 @@ class config_types(Enum):
 
 
 config_dict_types = {
-    "terminal": config_types.TERMINAL,
-    "schematic": config_types.SCHEMATIC,
-    "test": config_types.TEST,
-    "system": config_types.SYSTEM
+    config_types.TERMINAL: "term",
+    config_types.SCHEMATIC: "schem",
+    config_types.TEST: "test",
+    config_types.SYSTEM: "sysm"
 }
 
 
@@ -42,13 +42,13 @@ class config:
     path_locations = list()
     userConfig = None
     types = dict()
-    def __init__(self,filename=None,file_type=None):
-        if(filename == None):
+    def __init__(self,configName=None,file_type=None):
+        if(configName == None):
             return
         if(len(config.path_locations) == 0):
             config.getPaths()
-        #filename = os.path.join(script_dir, "Test_bench_definitions/" + filename)
-        #try
+        filename = configName + "." + config_dict_types[file_type] + ".yml" #create filename
+
         print("Finding "+ filename)
         for path in config.path_locations:
             for root, dirs, files in os.walk(path):
@@ -59,8 +59,8 @@ class config:
                             with open(filepath, 'r') as file:
                                 #data = yaml.safe_load(file) #cleaner solution?
                                 self.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
-                                if config_dict_types[self.type] != file_type:
-                                    continue
+                                #if config_dict_types[self.type] != file_type:
+                                #    continue
                                 print(f"{self.name} {self.type} loaded from {filepath}")
                                 self.success = True
                                 return
@@ -68,6 +68,7 @@ class config:
                             print(f"Error loading {filename}: {e}")
         print("Could not find "+ filename + " in paths");
         self.success = False;
+        raise FileNotFoundError
         #except:
         #    print("failed to load")
     def parseType(input):
@@ -95,16 +96,28 @@ class config:
         user_home = os.path.expanduser('~')
         morpheus_home =  os.path.join(user_home,".morpheus")
         try:
-            config.userConfig = config("user.yml",config_types.SYSTEM)
+            config.userConfig = config("user",config_types.SYSTEM)
         except FileNotFoundError:
             #TODO create new config file for user
+            config.createUserConfig()
+
             pass
-    
+    def createUserConfig():
+        print("Creating user.sysm.yml!")
+        config.userConfig = config()
+        #add all default values
+        config.userConfig.name= "user config"
+        config.userConfig.type= "system"
+        config.userConfig.paths = list()
+        config.saveUserConfig() #save!
+
+        config.userConfig.success = False #add that not successful after saving new user config
+
     def saveUserConfig():
         user_home = os.path.expanduser('~')
         morpheus_home =  os.path.join(user_home,".morpheus")
         
-        filename = os.path.join(morpheus_home,"user.yml");
+        filename = os.path.join(morpheus_home,"user.sysm.yml");
 
         with open(filename, 'w') as outfile:
             yaml.dump(config.userConfig, outfile, default_flow_style=False)
@@ -117,7 +130,7 @@ class config:
         else:
             print("Failed to find load user.yml, unable to add dir\n");
 
-    def getConfigs(file_type):
+    def getConfigs(file_type): #TODO test as MIGHT BE BROKEN
         configs = list()
         
         for path in config.path_locations:

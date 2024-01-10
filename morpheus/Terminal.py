@@ -4,12 +4,15 @@ from morpheus.Config import config_types
 class Terminal:
     terminals = dict()
     instances = dict()
-    def __init__(self,pin) -> None:
+    def __init__(self,pin) -> None: #for pin terminals
         self.eval  = False
         self.type = None
         self.label = pin.name
         pass
-    def update(self, pin):
+    def update(self, pin,pinslist = None):
+        if(pinslist): #has multiple pins
+            self.pinslist = pinslist
+             
         self.net = self.label
         self.type = pin.type
         self.region = pin.region #check
@@ -80,7 +83,7 @@ class Terminal:
         terminal = Terminal.terminals.get(term_type.term)
  
         if terminal is None:
-            terminal = config(term_type.term + ".yml", config_types.TERMINAL)
+            terminal = config(term_type.term, config_types.TERMINAL)
             Terminal.terminals.update({term_type.term:terminal})
 
         return terminal

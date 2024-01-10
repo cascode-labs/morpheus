@@ -1,0 +1,49 @@
+name: "OPAMP Feedback"
+type: "schematic"
+
+Terminals:
+  - name: "vss"
+    type: "vss"
+    term: "dc"
+    pattern: "vss"
+    region: 0
+    #parameters:
+    #  vdc: "vss"
+
+  - name: "vdd"
+    type: "vdd"
+    term: "dc"
+    pattern: "vdd|vcc"
+    region: 0
+
+  - name: "postive"
+    type: "postive"
+    term: "dc"
+    pattern: "v2"
+    region: 0
+
+  - name: "negative"
+    type: "negative"
+    term: "dc"
+    pattern: "v1"
+    region: 0
+
+  - name: "postive"
+    type: "postive"
+    term: "dc"
+    pattern: "v2"
+    region: 0
+
+  - name: "output"
+    type: "output"
+    term: "dc"
+    pattern: "vo"
+    region: 0
+  
+Modules:
+  - name: "feebackR"
+    term: "resistor"
+    region: 0
+    pins:
+    - pattern: "vo"
+    - pattern: "v1"

@@ -15,7 +15,7 @@ from morpheus import *
 id = "test"
 lib = "morpheus_tests"
 DUT = "iopamp"
-configFile = "opamp.yml"
+configFile = "opamp"
 tconfig = None
 
 
@@ -25,9 +25,12 @@ from subprocess import Popen, PIPE
 ws = Workspace.open(id)
 
 DUT = ws.db.open_cell_view("morpheus_tests","opamp","symbol")
-configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
-Testbench = schematic(ws,lib,DUT,configFile, tconfig)
-Testbench.evaluate();
-Testbench.plan();
-Testbench.build();
+try:
+    configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
+    Testbench = schematic(ws,lib,DUT,configFile, tconfig)
+    Testbench.evaluate();
+    Testbench.plan();
+    Testbench.build();
+except FileNotFoundError:
+    print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")
 # morpheus schematic op

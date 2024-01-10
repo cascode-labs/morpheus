@@ -77,6 +77,29 @@ class schematic:
             self.evaluatedPins.append(term)
 
 
+        if(hasattr(self.config,"Modules")): #config has modules
+            for module in self.config.Modules:
+                pinslist= list()
+                pinnum = 0
+                for subpin in module.pins:
+                    DUTpin = None
+                    for pin in self.DUT.terminals:  #Use pattern to find DUTpin (TODO: upgrade to nets instead)
+                        if(re.search(subpin.pattern,pin.name) != None):
+                            DUTpin = pin
+                            break
+                           
+                    
+                        
+                    if(not DUTpin):
+                        print("Could not find pin ", pinnum ," for ", module.name)
+                        break
+                    pinslist.append(DUTpin)
+                    pinnum+=1
+                else: #only runs if successfully ran (will not run on break)
+                    term = Terminal(module) #create new terminal
+                    term.update(module,pinslist=pinslist)
+                    self.evaluatedPins.append(term)
+
     def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN
         max_region = 4
         if(hasattr(self.config,"Build")):
