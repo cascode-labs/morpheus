@@ -138,14 +138,16 @@ class config:
                 for file in files:
                     if(os.path.splitext(file)[1] == ".yml" ):
                         filepath = os.path.join(root, file)
+                        
                         try:
-                            with open(filepath, 'r') as file:
-                                config_temp = config()
-                                #data = yaml.safe_load(file) #cleaner solution?
-                                config_temp.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
-                                if config_dict_types[config_temp.type] != file_type:
-                                    continue
-                                configs.append(config_temp);
+                            value = os.path.splitext(os.path.splitext(file)[0])[1]
+                            if( value == "." + config_dict_types[file_type]):
+                                with open(filepath, 'r') as file:
+                                    config_temp = config()
+                                    #data = yaml.safe_load(file) #cleaner solution?
+                                    config_temp.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
+
+                                    configs.append(config_temp);
                         except Exception as e:
                             print(f"Error loading {filepath}: {e}")
         return configs
