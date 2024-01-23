@@ -1,4 +1,4 @@
-name: "OPAMP"
+name: "OPAMP_Open_Loop"
 type: "schematic"
 
 Terminals:
@@ -15,12 +15,13 @@ Terminals:
     term: "dc"
     pattern: "vdd|vcc"
     region: 0
-
+    
   - name: "postive"
     type: "postive"
-    term: "dc"
+    term: "gnd"
     pattern: "v2"
     region: 0
+
 
   - name: "negative"
     type: "negative"
@@ -28,15 +29,12 @@ Terminals:
     pattern: "v1"
     region: 0
 
-  - name: "postive"
-    type: "postive"
-    term: "dc"
-    pattern: "v2"
-    region: 0
 
   - name: "output"
     type: "output"
-    term: "dc"
+    term: "res"
     pattern: "vo"
     region: 0
+    parameters:
+      r: "10M"
 

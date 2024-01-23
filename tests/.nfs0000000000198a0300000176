@@ -1,0 +1,208 @@
+COPYRIGHT (C) 1992-2019  CADENCE DESIGN SYSTEMS INC.  ALL RIGHTS RESERVED.
+          (C) 1992-2019  UNIX SYSTEMS Laboratories INC.,
+                         Reproduced with permission.
+
+This Cadence Design Systems program and online documentation are
+proprietary/confidential information and may be disclosed/used only
+as authorized in a license agreement controlling such use and disclosure.
+
+          RESTRICTED RIGHTS NOTICE (SHORT FORM)
+Use/reproduction/disclosure is subject to restriction
+set forth at FAR 1252.227-19 or its equivalent.
+Loading geView.cxt 
+Loading menuBuilder.cxt 
+Loading schView.cxt 
+Loading selectSv.cxt 
+Loading wireEdit.cxt 
+Loading pte2.cxt 
+Loading xlUI.cxt 
+Loading auCore.cxt 
+Loading vhdl.cxt 
+Loading seismic.cxt 
+Loading ci.cxt 
+Loading layers.cxt 
+Loading ams.cxt 
+Loading cli.cxt 
+Loading cle.cxt 
+Virtuoso Framework License (111) was checked out successfully. Total checkout time was 0.01s.
+*WARNING* '/home/jehess/cds.lib', Line 3: Skipping: 'Test' /home/jehess/Test
+*WARNING* LIB analogLib from File /home/jehess/morpheus/tests/cds.lib Line 6 redefines
+LIB analogLib from File /home/jehess/cds.lib
+Insert UNDEFINE analogLib
+before DEFINE analogLib
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE analogLib
+    in /home/jehess/cds.lib
+to suppress this warning message.
+*WARNING* LIB basic from File /home/jehess/morpheus/tests/cds.lib Line 7 redefines
+LIB basic from File /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+Insert UNDEFINE basic
+before DEFINE basic
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE basic
+    in /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+to suppress this warning message.
+> t
+Available commands:
+	pyStartServer ?id "default" ?logLevel "WARNING" ?singleMode nil ?timeout nil ?python "python"
+	pyKillServer
+	pyReloadScript
+	pyShowLog [numberOfLines]
+	pyRunScript path ?args list() ?python "python"
+t
+> t
+> hello
+server was stopped with code -1
+COPYRIGHT (C) 1992-2019  CADENCE DESIGN SYSTEMS INC.  ALL RIGHTS RESERVED.
+          (C) 1992-2019  UNIX SYSTEMS Laboratories INC.,
+                         Reproduced with permission.
+
+This Cadence Design Systems program and online documentation are
+proprietary/confidential information and may be disclosed/used only
+as authorized in a license agreement controlling such use and disclosure.
+
+          RESTRICTED RIGHTS NOTICE (SHORT FORM)
+Use/reproduction/disclosure is subject to restriction
+set forth at FAR 1252.227-19 or its equivalent.
+Loading geView.cxt 
+Loading menuBuilder.cxt 
+Loading schView.cxt 
+Loading selectSv.cxt 
+Loading wireEdit.cxt 
+Loading pte2.cxt 
+Loading xlUI.cxt 
+Loading auCore.cxt 
+Loading vhdl.cxt 
+Loading seismic.cxt 
+Loading ci.cxt 
+Loading layers.cxt 
+Loading ams.cxt 
+Loading cli.cxt 
+Loading cle.cxt 
+Virtuoso Framework License (111) was checked out successfully. Total checkout time was 0.01s.
+*WARNING* '/home/jehess/cds.lib', Line 3: Skipping: 'Test' /home/jehess/Test
+*WARNING* LIB analogLib from File /home/jehess/morpheus/tests/cds.lib Line 6 redefines
+LIB analogLib from File /home/jehess/cds.lib
+Insert UNDEFINE analogLib
+before DEFINE analogLib
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE analogLib
+    in /home/jehess/cds.lib
+to suppress this warning message.
+*WARNING* LIB basic from File /home/jehess/morpheus/tests/cds.lib Line 7 redefines
+LIB basic from File /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+Insert UNDEFINE basic
+before DEFINE basic
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE basic
+    in /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+to suppress this warning message.
+> t
+Available commands:
+	pyStartServer ?id "default" ?logLevel "WARNING" ?singleMode nil ?timeout nil ?python "python"
+	pyKillServer
+	pyReloadScript
+	pyShowLog [numberOfLines]
+	pyRunScript path ?args list() ?python "python"
+t
+> t
+> hello
+t
+>  /home/jehess/Test
+Loading schematic.cxt 
+Loading ddui.cxt 
+Loading lx.cxt 
+Loading lce.cxt 
+Loading le.cxt 
+Loading rte.cxt 
+Loading adexlCore.cxt 
+Loading oasis.cxt 
+Loading dal.cxt 
+Loading awv.cxt 
+Loading socket.cxt 
+Loading analog.cxt 
+Loading par.cxt 
+Loading asimenv.cxt 
+Loading alvs.cxt 
+Loading caa.cxt 
+Loading amps.cxt 
+Loading adexl.cxt 
+Loading vdsil.cxt 
+Loading te.cxt 
+Loading schHDL.cxt 
+Loading elec.cxt 
+Loading vqp.cxt 
+Loading simui.cxt 
+Loading viva.cxt 
+Loading spectrei.cxt 
+Loading devCheck.cxt 
+Loading relXpert.cxt 
+Loading hspiceD.cxt 
+Loading spectreinl.cxt 
+Loading msgHandler.cxt 
+Loading UltraSim.cxt 
+Loading AMSOSS.cxt 
+Loading AMS.cxt 
+WARNING (ASSEMBLER-9065): Failed to set the value of variable 'VDD' for test TEST2 because test TEST2 does not exist. Specify a valid test name.
+WARNING (ASSEMBLER-9065): Failed to set the value of variable 'VCC' for test TEST2 because test TEST2 does not exist. Specify a valid test name.
+Loading adpServer.cxt 
+*WARNING* file /home/jehess/CDS.log cls: Unable to connect to clsbd on host "research-3.ece.iastate.edu".
+Check if clsbd is running on the host. If the host is not valid remove
+the ".cdslck" lock file. The connect timeout length can be set using
+the CLS_CLSBD_CONNECT_TIMEOUT environment variable.
+
+COPYRIGHT (C) 1992-2023  CADENCE DESIGN SYSTEMS INC.  ALL RIGHTS RESERVED.
+          (C) 1992-2023  UNIX SYSTEMS Laboratories INC.,
+                         Reproduced with permission.
+
+This Cadence Design Systems program and online documentation are
+proprietary/confidential information and may be disclosed/used only
+as authorized in a license agreement controlling such use and disclosure.
+
+          RESTRICTED RIGHTS NOTICE (SHORT FORM)
+Use/reproduction/disclosure is subject to restriction
+set forth at FAR 1252.227-19 or its equivalent.
+Loading geView.cxt 
+Loading menuBuilder.cxt 
+Loading schView.cxt 
+Loading selectSv.cxt 
+Loading wireEdit.cxt 
+Loading pte2.cxt 
+Loading xlUI.cxt 
+Loading auCore.cxt 
+Loading vhdl.cxt 
+Loading seismic.cxt 
+Loading ci.cxt 
+Loading ams.cxt 
+Loading adexlDM.cxt 
+Loading cpf.cxt 
+Loading cli.cxt 
+Loading lp.cxt 
+Virtuoso Framework License (111) was checked out successfully. Total checkout time was 0.02s.
+*WARNING* '/home/jehess/cds.lib', Line 3: Skipping: 'Test' /home/jehess/Test
+*WARNING* LIB analogLib from File /home/jehess/morpheus/tests/cds.lib Line 6 redefines
+LIB analogLib from File /home/jehess/cds.lib
+Insert UNDEFINE analogLib
+before DEFINE analogLib
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE analogLib
+    in /home/jehess/cds.lib
+to suppress this warning message.
+*WARNING* LIB basic from File /home/jehess/morpheus/tests/cds.lib Line 7 redefines
+LIB basic from File /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+Insert UNDEFINE basic
+before DEFINE basic
+    in /home/jehess/morpheus/tests/cds.lib
+Or remove or comment out DEFINE basic
+    in /remote/ncsu_oa/ncsu-cdk-1.6.0.beta/cdssetup/cds.lib
+to suppress this warning message.
+> Available commands:
+	pyStartServer ?id "default" ?logLevel "WARNING" ?singleMode nil ?timeout nil ?python "python"
+	pyKillServer
+	pyReloadScript
+	pyShowLog [numberOfLines]
+	pyRunScript path ?args list() ?python "python"
+t
+> t
+> t
+> 

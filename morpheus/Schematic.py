@@ -2,9 +2,13 @@ from morpheus.Config import *
 import re
 import copy
 import math
+import logging
 from morpheus.Exceptions.SelectionBox import SelectionBoxException
 
 from morpheus.Terminal import Terminal
+
+logger = logging.getLogger(__name__)
+
 class DUT_pin:
     def __init__(self,pin) -> None:
         self.eval  = False
@@ -13,6 +17,7 @@ class DUT_pin:
         self.type = ""
     
 class schematic:
+
     def __init__(self,ws,lib,DUT,config, tconfig) -> None:
         self.DUT = DUT
         self.ws = ws
@@ -40,6 +45,7 @@ class schematic:
         #self.maestro.createEquations()
 
         self.ws.dd.DeleteObj(cvid) #delete
+        
         self.plan()
         self.build()
 
@@ -47,6 +53,7 @@ class schematic:
         instance = self.instances.get(inst.name)
  
         if  instance is None:
+            logger.info("Skill loading " + inst.name)
             print("Skill loading " + inst.name)
             instance = self.ws.db.OpenCellViewByType(inst.lib, inst.name, "symbol")
             self.instances.update({inst.name: instance})
@@ -64,7 +71,7 @@ class schematic:
     def evaluate(self):
         #match pin names to terminals defined in the PLAN section of schematic config
         #for(term in self.config.Build):
-            
+        logger.info("Starting evaulation for DUT pins")    
         for pin in self.DUT.terminals: 
             inst = DUT_pin(pin.name) #contains default values
             term = Terminal(pin)
@@ -78,6 +85,7 @@ class schematic:
 
 
         if(hasattr(self.config,"Modules")): #config has modules
+            logger.info("Starting evaulation for modules")  
             for module in self.config.Modules:
                 pinslist= list()
                 pinnum = 0
@@ -91,6 +99,7 @@ class schematic:
                     
                         
                     if(not DUTpin):
+                        logger.warning("Could not find pin ", pinnum ," for ", module.name)
                         print("Could not find pin ", pinnum ," for ", module.name)
                         break
                     pinslist.append(DUTpin)
@@ -185,12 +194,13 @@ class schematic:
     def build(self):
         ws= self.ws
         terminals = self.terminals
-
+        logger.info("Start building schematic")
         print("Building!")
         #create cell view for schematic
         #self.view = "schematic_" + self.config.name #TODO standarize this to set in init
         cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
         if(cv is None): #TODO CREATION EXCEPTIONS
+            logger.error("Cannot build schematic because schematic not found. Check if open elsewhere")
             print("Error: Schematic not found. Check if open elsewhere")
             return
         self.cv = cv #unnecissary
@@ -216,6 +226,7 @@ class schematic:
         ws.db.Check(cv) 
         ws.db.Save(cv)
         ws.db.Close(cv)
+        logger.info("Finished building schematic")
     #end build
     
     #ported from skill

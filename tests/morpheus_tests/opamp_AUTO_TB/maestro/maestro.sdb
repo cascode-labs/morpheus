@@ -1,35 +1,19 @@
 <?xml version="1.0"?>
 <setupdb version="6">maestro
 	<active>Active Setup
-		<jobcontrolmode>LSCS</jobcontrolmode>
 		<corners>
 			<corner enabled="1">_default</corner>
 			<corner>corner1
 				<vars>
-					<var>DATA_path
-						<value>default</value>
+					<var>temp
+						<value>temp</value>
 					</var>
-					<var>CLK_path
-						<value>default</value>
-					</var>
-					<var>VIO_path
-						<value>default</value>
+					<var>temp2
+						<value>temp2</value>
 					</var>
 				</vars>
 			</corner>
-			<corner>corner2
-				<vars>
-					<var>DATA_path
-						<value>default</value>
-					</var>
-					<var>CLK_path
-						<value>default</value>
-					</var>
-					<var>VIO_path
-						<value>default</value>
-					</var>
-				</vars>
-			</corner>
+			<corner>corner2</corner>
 		</corners>
 		<currentmode>Single Run, Sweeps and Corners</currentmode>
 		<overwritehistory>0</overwritehistory>
@@ -47,7 +31,7 @@
 						<value>spectre</value>
 					</option>
 					<option>view
-						<value>OPAMP</value>
+						<value>OPAMP_Open_Loop</value>
 					</option>
 					<option>path
 						<value>$AXL_SETUPDB_DIR</value>
@@ -64,6 +48,20 @@
 						<value>3.8</value>
 					</var>
 				</vars>
+				<origoptions>
+					<option>cell
+						<value>opamp_AUTO_TB</value>
+					</option>
+					<option>lib
+						<value>morpheus_tests</value>
+					</option>
+					<option>sim
+						<value>spectre</value>
+					</option>
+					<option>view
+						<value>OPAMP_Open_Loop</value>
+					</option>
+				</origoptions>
 			</test>
 		</tests>
 		<vars>

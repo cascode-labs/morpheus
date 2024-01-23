@@ -1,0 +1,36 @@
+name: "opamp_feeback"
+type: "test"
+
+#scriptpath: '/PATH/TO/SKILL/SCRIPT'
+#script: "SCRIPTNAME"
+
+schematic: opamp_feedback
+
+variables:
+  - name: "VDD"
+    test: [Global,TEST1,TEST2]
+    value: -3.8
+
+  - name: "VCC"
+    test: [Global,TEST1,TEST2]
+    value: 3.8
+
+tests:
+  - name: "feedback"
+    analysis:
+        type: "ac"
+        options: 
+          - [sweep, Frequency]
+          - [rangeType, Start-Stop]
+          - [start, "0"]
+          - [stop, "10000"]
+          - [incrType, Automatic]
+    equations:
+    - name: "Open Loop Gain"
+      type: "output"
+      equation: value(IS("/V_{output}/MINUS") 27)
+      #VOUT = A * Vin
+    corners:
+      - name: corner1
+      - name: corner2
+  

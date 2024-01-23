@@ -14,6 +14,14 @@
             "justMyCode": true
         },
         {
+            "name": "Python: Manager Test",
+            "type": "python",
+            "request": "launch",
+            "program": "tests/cadencemanagertest.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Python: Maestro Test",
             "type": "python",
             "request": "launch",
@@ -42,7 +50,15 @@
             "type": "python",
             "request": "launch",
             "module": "morpheus",
-            "args": ["schematic","--DUTlib","morpheus_tests","--id", "test","--DUTcell", "opamp","--lib","morpheus_tests","--config","opamp.yml"],
+            "args": ["schematic","--DUTlib","morpheus_tests","--id", "test","--DUTcell", "opamp","--lib","morpheus_tests","--config","opamp"],
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Module schematic test no ID",
+            "type": "python",
+            "request": "launch",
+            "module": "morpheus",
+            "args": ["schematic","--DUTlib","morpheus_tests","--DUTcell", "opamp","--lib","morpheus_tests","--config","opamp"],
             "justMyCode": true
         },
         

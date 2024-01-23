@@ -8,14 +8,20 @@ class Terminal:
         self.eval  = False
         self.type = None
         self.label = pin.name
+        self.dictionary = dict()
+        self.dictionary["name"] = pin.name
         pass
     def update(self, pin,pinslist = None):
         if(pinslist): #has multiple pins
             self.pinslist = pinslist
+            num = 0
+            for pin_PL in self.pinslist:
+                self.dictionary["pin" + str(num)] = pin_PL.name #add all pins to dictionary
+                num+=1
              
         self.net = self.label
-        self.type = pin.type
-        self.region = pin.region #check
+        if(hasattr(pin,"type")): self.type = pin.type
+        if(hasattr(pin,"region")):self.region = pin.region #check
         self.term = pin
         self.config = Terminal.getTerminal(pin)
         self.width = self.config.width
@@ -57,7 +63,7 @@ class Terminal:
                 if(inst.name == "wire"): #WIRE SPECIAL CASE
                     mywire = ws.sch.CreateWire(cv, "draw", "full", position, 0.0625, 0.0625, 0.0)
                     if(hasattr(inst,"label") and hasattr(self,"label")):
-                        ws.sch.CreateWireLabel(cv, mywire[0], [position[0][0] + 0.0325,position[0][1] + 0.05], inst.label.format(name = self.net), "upperLeft", "R90", "stick", 0.0625, True)
+                        ws.sch.CreateWireLabel(cv, mywire[0], [position[0][0] + 0.0325,position[0][1] + 0.05], inst.label.format(**self.dictionary), "upperLeft", "R90", "stick", 0.0625, True)
                 else:
                     symbol = Terminal.getInst(ws,inst)
                     name = self.config.name + "_" + inst.name #TODO BETTER NAMING SYSTEM

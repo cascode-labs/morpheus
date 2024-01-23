@@ -31,6 +31,18 @@ try:
     Testbench.evaluate();
     Testbench.plan();
     Testbench.build();
+
+except FileNotFoundError:
+    print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")
+configFile = "opamp_feedback"
+
+try:
+    configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
+    Testbench = schematic(ws,lib,DUT,configFile, tconfig)
+    Testbench.evaluate();
+    Testbench.plan();
+    Testbench.build();
+
 except FileNotFoundError:
     print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")
 # morpheus schematic op

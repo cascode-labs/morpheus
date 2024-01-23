@@ -12,7 +12,7 @@ from morpheus import *
 id = "test"
 lib = "morpheus_tests"
 DUT = "iopamp"
-configFile = "opamp.yml"
+configFile = "opamp"
 tconfig = None
 
 ws = Workspace.open(id)

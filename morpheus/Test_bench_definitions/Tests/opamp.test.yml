@@ -29,7 +29,15 @@ tests:
     - name: "EQUATION_1"
       type: "vdd"
       equation: value(IS("/V_{vdd}/MINUS") 27)
+    - name: "Open Loop Gain"
+      type: "vdd"
+      equation: value(IS("/V_{vdd}/MINUS") 27)
     corners:
       - name: corner1
+        vars:
+          - name: "temp"
+            value: "temp"
+          - name: "temp2"
+            value: "temp2"
       - name: corner2
   

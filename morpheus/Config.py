@@ -1,10 +1,17 @@
 from enum import Enum
+import logging
 import yaml
 import os
 from yaml.loader import UnsafeLoader
 import types
 import json
-script_dir = os.path.dirname(__file__)
+import sys
+if getattr(sys, 'frozen', False): #EXE 
+    script_dir = os.path.dirname(sys.executable)
+elif __file__: #AS PYTHON CODE
+    script_dir = os.path.dirname(__file__)
+
+logger = logging.getLogger(__name__)
 
 import os, sys
 
@@ -58,7 +65,9 @@ class config:
                         try:
                             with open(filepath, 'r') as file:
                                 #data = yaml.safe_load(file) #cleaner solution?
-                                self.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
+                                yaml_load = yaml.load(file,Loader=SafeLoaderIgnoreUnknown)
+                                json_load = json.loads(json.dumps(yaml_load), object_hook=load_object).__dict__
+                                self.__dict__.update(json_load)
                                 #if config_dict_types[self.type] != file_type:
                                 #    continue
                                 print(f"{self.name} {self.type} loaded from {filepath}")
@@ -134,23 +143,33 @@ class config:
         configs = list()
         
         for path in config.path_locations:
+            logger.debug(f"Checking {path} for ",config_dict_types[file_type]);
+            print(f"Checking {path} for ",config_dict_types[file_type])
             for root, dirs, files in os.walk(path):
                 for file in files:
+                    print("found file ", file)
                     if(os.path.splitext(file)[1] == ".yml" ):
                         filepath = os.path.join(root, file)
                         
                         try:
-                            value = os.path.splitext(os.path.splitext(file)[0])[1]
-                            if( value == "." + config_dict_types[file_type]):
+                            value = os.path.splitext(os.path.splitext(file)[0])
+                            file_name_part = value[0]
+                            file_type_part = value[1]
+                            if( file_type_part == "." + config_dict_types[file_type]):
                                 with open(filepath, 'r') as file:
                                     config_temp = config()
                                     #data = yaml.safe_load(file) #cleaner solution?
-                                    config_temp.__dict__.update(json.loads(json.dumps(yaml.safe_load(file)), object_hook=load_object).__dict__)
-
+                                    config_temp.__dict__.update(json.loads(json.dumps(yaml.load(file,Loader=SafeLoaderIgnoreUnknown)), object_hook=load_object).__dict__)
+                                    config_temp.filename = file_name_part
                                     configs.append(config_temp);
                         except Exception as e:
                             print(f"Error loading {filepath}: {e}")
         return configs
     
+class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+    def ignore_unknown(self, node):
+        return None 
+
+SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
 #path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))

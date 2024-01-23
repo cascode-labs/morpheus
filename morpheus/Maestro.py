@@ -31,7 +31,7 @@ class maestro:
     def getSchematic(self,test):
         schem = self.schematics.get(test.schematic)
         if(schem is None): #doesnt exist
-            sconfig = config("{filename}.yml".format(filename = test.schematic),config_types.SCHEMATIC)
+            sconfig = config("{filename}".format(filename = test.schematic),config_types.SCHEMATIC)
             schem = schematic(self.ws,self.lib,self.DUT,sconfig,test)
             schem.evaluate()
             #
@@ -92,8 +92,9 @@ class maestro:
         #if(self.PWL):
         newCorner = self.ws.axl.PutCorner(self.x_mainSDB, corner.name)
         #ADD ALL CORNER VARIABLES
-        for var in corner.vars:
-            self.ws.axl.PutVar(newCorner, var.name, var.value)
+        if(hasattr(corner,"vars")):
+            for var in corner.vars:
+                self.ws.axl.PutVar(newCorner, var.name, var.value)
             
     def createEquations(self, test):
         for equation in test.equations:

@@ -36,5 +36,8 @@ mv dist/morpheus-*.tar.gz "$DIST_PATH/packages/"
 
 chmod 775 $DIST_PATH
 
+#symbolic link (broken?)
+ln -s -f v$VERSION/bin/morpheus dist/morpheus
+
 echo "  build saved to $DIST_PATH"
-echo "  build complete!"
+echo "  build complete!"  

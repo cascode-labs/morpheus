@@ -62,7 +62,7 @@ class GUIController():
         Files = config.getConfigs(config_types.TEST)
         tests = list()
         for file in Files:
-            tests.append(file.name)
+            tests.append(file.filename)
         
         
         #for test in Files:
@@ -104,7 +104,7 @@ class GUIController():
                                   self.cellList[self.GUIframe.sel_dut_cell.GetSelection()],
                                   self.libList[self.GUIframe.sel_lib.GetSelection()])
 
-        test = config("Tests/"+ self.GUIframe.sel_test.GetValue() + ".yml") #Load test config YAML
+        test = config(self.GUIframe.sel_test.GetValue(),config_types.TEST) #Load test config YAML
         
         schem = self.maestro.getSchematic(test)  #Create test schematic cooresponding to YAML
         self.maestro.createConfig(test)

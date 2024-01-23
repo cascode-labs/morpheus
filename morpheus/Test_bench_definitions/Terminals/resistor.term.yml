@@ -1,0 +1,20 @@
+#Created by Jonathan Hess 1/12/24
+name: "RES"
+type: "terminal"
+width: 0.5
+height: 1
+Insts:
+  - name: "res"
+    lib: "analogLib"
+    instance: "{name}_res"
+    position: [0,0]
+    parameters:
+      "r": "{name}"
+
+  - name: "wire"
+    label: "{pin0}"
+    position: [[0,0],[0,0.375]]
+
+  - name: "wire"
+    label: "{pin1}" 
+    position: [[0,-0.375],[0,-0.75]]
