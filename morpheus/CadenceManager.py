@@ -17,34 +17,20 @@ elif __file__: #AS PYTHON CODE
 
 
 
-def get_terminal_cwd():
-    if getattr(sys, 'frozen', False):
-        
-        # If the script is frozen, try to get the current working directory
-        try:
-            # Use the PWD environment variable if available
-            return os.environ['PWD']
-        except KeyError:
-            # Fallback to os.getcwd() if PWD is not available
-            return os.getcwd()
-    else:
-        # If the script is frozen, use the directory of the executable
-        return os.path.dirname(__file__)
 
-        
 class cadenceManager:
     def __init__(self,id):
         self.timeout= 300 #5 minute timeout
-        self.log_file = os.path.join(get_terminal_cwd(), "virtuoso_log.txt")
+        self.log_file = os.path.join(os.getcwd(), "virtuoso_log.txt")
         self.createNewCadence(id)
         self.checkInactive()
-        self.loop()
+        #self.loop()
         
     def createNewCadence(self, id):
         
         
         # Run virtuoso with input from a string
-        virtuoso_process = subprocess.Popen(["virtuoso", "-nograph"],cwd=get_terminal_cwd(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        virtuoso_process = subprocess.Popen(["virtuoso", "-nograph"],cwd=os.getcwd(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         def log_stdout():
             with open(self.log_file, 'w') as log_file:
@@ -53,7 +39,7 @@ class cadenceManager:
                     if not line:
                         break
                     log_file.write(line)
-                    print(line, end='')  # Print to console
+                    #print(line, end='')  # Print to console ADD DEBUGGER CODE
 
         log_thread = threading.Thread(target=log_stdout)
         log_thread.start()
@@ -96,7 +82,8 @@ class cadenceManager:
     def checkInactive(self):
         self.status = self.ws['checkstatus']()
         self.ws['clearstatus']()
-        
+    def setActive(self):
+        self.ws['setstatus']()
     def killCadence(self):
         try:
             self.ws['killcadence']()
@@ -106,6 +93,7 @@ class cadenceManager:
         while(self.status is not None):
             sleep(self.timeout)
             self.checkInactive()
+            #add check to morpheus client
         self.killCadence()
             
         

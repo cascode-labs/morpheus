@@ -10,19 +10,18 @@ import os
 
 class GUIController():
     MorpheusExceptionHandler()
-    def __init__(self, id) -> None:
+    def __init__(self, ws) -> None:
         self.MEH =  MorpheusExceptionHandler()
 
         self.MorpheusApp = wx.App()
         self.GUIframe = GUIViewer(None,wx.ID_ANY, "")
-        self.id = id
         self.libList = None
         self.cellList = None    
 
         self.testPins = []
         self.schems = []
         #print("id is ", self.id)
-        self.ws = Workspace.open(self.id) #open skillbridge
+        self.ws = ws
         #try:
         #    print("create ws")
        #     self.ws = Workspace.open(self.id) #open skillbridge

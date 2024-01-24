@@ -54,6 +54,7 @@
             "justMyCode": true
         },
         {
+            //schematic --DUTlib morpheus_tests --DUTcell opamp --lib morpheus_tests --config opamp
             "name": "Python: Module schematic test no ID",
             "type": "python",
             "request": "launch",

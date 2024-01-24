@@ -13,11 +13,7 @@ elif __file__: #AS PYTHON CODE
 
 logger = logging.getLogger(__name__)
 
-import os, sys
 
-if getattr(sys, 'frozen', False):
-    script_dir = os.path.dirname(sys.executable)
-    os.chdir(script_dir)
 
 
 def load_object(dct):
@@ -86,7 +82,6 @@ class config:
         return type;    
     
     def getPaths():
-        script_dir = os.path.dirname(__file__)
         user_home = os.path.expanduser('~')
         morpheus_home =  os.path.join(user_home,".morpheus")
         
