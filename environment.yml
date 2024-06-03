@@ -5,15 +5,17 @@ channels:
 dependencies:
   # Runtime
   - attrdict3=2.0.2
-  - wxPython=4.2.1
+  - wxPython=4.2.1 #GUI
   - python=3.11
   - pydantic=2.0.3
   - pandas=2.0.3
   - rich=13.4.2
-  - skillbridge=1.5.0
+  - skillbridge=1.5.0 #python-skill communication
+  - beautifulsoup4 #XML 
+  - lxml
  # Development and Testing
-  - PyInstaller=5.13.0
-  - conda=23.5.2
+  - PyInstaller=5.13.0 #build
+  - conda=23.5.2 #ENV
   - mamba=1.4.9
   - pip=23.2
   - flit=3.9.0
@@ -23,3 +25,4 @@ dependencies:
   # documentation
   - mkdocs=1.4.3
   - mkdocs-material=9.1.19
+

@@ -19,18 +19,22 @@ elif __file__: #AS PYTHON CODE
 
 
 class cadenceManager:
-    def __init__(self,id):
+    def __init__(self,id, cwd=None, precommand= ""):
         self.timeout= 300 #5 minute timeout
-        self.log_file = os.path.join(os.getcwd(), "virtuoso_log.txt")
-        self.createNewCadence(id)
+        if(cwd is None): cwd=os.getcwd()
+        self.log_file = os.path.join(cwd, "virtuoso_log.txt")
+        self.createNewCadence(id,cwd, precommand)
         self.checkInactive()
         #self.loop()
         
-    def createNewCadence(self, id):
+    def createNewCadence(self, id,cwd, precommand):
         
         
         # Run virtuoso with input from a string
-        virtuoso_process = subprocess.Popen(["virtuoso", "-nograph"],cwd=os.getcwd(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("start cadence at: "+ cwd)
+        command = precommand.split() + [ ";icfb", "-nograph"]
+        #virtuoso_process = subprocess.Popen(command, capture_output=True, shell=True)
+        virtuoso_process = subprocess.Popen(command ,cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True) #TODO SUPPORT BOTH VIRTUOSO AND ICFB
 
         def log_stdout():
             with open(self.log_file, 'w') as log_file:

@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "Python: Schematic Test",
             "type": "python",
@@ -26,6 +27,14 @@
             "type": "python",
             "request": "launch",
             "program": "tests/maestrotests.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Plotting Test",
+            "type": "python",
+            "request": "launch",
+            "program": "tests/plottingtemplatetest.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
