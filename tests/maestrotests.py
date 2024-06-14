@@ -11,15 +11,15 @@ from morpheus import *
 
 id = "test"
 lib = "morpheus_tests"
-DUT = "iopamp"
+DUT = "5T_Op_Amp"
 configFile = "opamp"
 tconfig = None
 
 ws = Workspace.open(id)
 
-DUT = ws.db.open_cell_view("morpheus_tests","opamp","symbol")
+DUT = ws.db.open_cell_view("morpheus_tests",DUT,"symbol")
 configFile = Config.config(configFile,Config.config_types.TEST)
-Testbench = maestro(ws,lib,DUT,test = configFile)
+Testbench = maestro(ws,lib,DUT,configFile)
 #session = maeOpenSetup("morpheus_tests" "opamp_AUTO_TB" "maestro_test") 
 #maeCreateTest("firstTest" ?session session ?lib "morpheus_tests" ?cell "opamp_AUTO_TB" ?view "maestro_test")
 

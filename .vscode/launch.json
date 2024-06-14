@@ -4,13 +4,37 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
 
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
 
         {
             "name": "Python: Schematic Test",
             "type": "python",
             "request": "launch",
             "program": "tests/schematictest.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Schematic getDUT Test",
+            "type": "python",
+            "request": "launch",
+            "program": "tests/addWirestoSchematic.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Maestro get Schematic and add equations Test",
+            "type": "python",
+            "request": "launch",
+            "program": "tests/schematicimporttest.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },

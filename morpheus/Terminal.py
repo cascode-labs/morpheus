@@ -1,5 +1,6 @@
 from morpheus.Config import config
 from morpheus.Config import config_types
+import re
 
 class Terminal:
     terminals = dict()
@@ -27,8 +28,8 @@ class Terminal:
         self.width = self.config.width
         self.height = self.config.height
         self.eval = True
-        if(self.type == 'gnd'):
-            self.net = 'gnd!'
+        #if(self.type == 'gnd'):
+        #    self.net = 'gnd!'
         if(hasattr(self.term, "label")):
             self.net = self.term.label
 
@@ -45,7 +46,7 @@ class Terminal:
 
     def build(self,ws,cv,dir):
         #TODO add special case for no connect
-        if(self.type == "NOCONNECT"):
+        if(self.term.term == "NOCONNECT"):
             name = self.label + "_NOCONN"
             rt =ws.db.ConcatTransform([[0,0],dir[0]],[[0,0],"R90"])
             instance = ws.db.OpenCellViewByType("basic", "noConn", "symbol")
@@ -79,7 +80,10 @@ class Terminal:
                         if(hasattr(self.term,"parameters")): #Terminal takes priority over default
                             for param in self.term.parameters.__dict__:
                                 #TODO ERROR CATCH NUMBERS
-                                property = self.term.parameters.__dict__.get(param).format(name = self.label)
+                                propText = self.term.parameters.__dict__.get(param)
+                                property = propText.format(name = self.label)
+                                if propText.find("regex") != -1:
+                                    property = re.sub(self.term.pattern,propText.replace("regex","") ,self.label) #Do regular expression replace
                                 prop.append([param,"string",property])
                                     
                     new_inst = ws.db.CreateParamInst(cv, symbol, name, position, "R0",1,prop) #create instance with parameters
