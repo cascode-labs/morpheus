@@ -85,8 +85,10 @@ class Terminal:
                                 if propText.find("regex") != -1:
                                     property = re.sub(self.term.pattern,propText.replace("regex","") ,self.label) #Do regular expression replace
                                 prop.append([param,"string",property])
-                                    
-                    new_inst = ws.db.CreateParamInst(cv, symbol, name, position, "R0",1,prop) #create instance with parameters
+                    rotation = "R0" #add rotate functionality
+                    if(hasattr(inst,"rotation")):
+                        rotation = "R" + str(inst.rotation)   
+                    new_inst = ws.db.CreateParamInst(cv, symbol, name, position, rotation,1,prop) #create instance with parameters
             #end For Loop per Instance
         #end For Loop per Terminal
     def getTerminal(term_type):

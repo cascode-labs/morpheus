@@ -66,9 +66,11 @@ class maestro:
     def createTests(self):
         #SINGLE TEST
         if not hasattr(self.config, "tests"): #TODO not this. I don't like this.
+            #schem = self.getSchematic(self.config)
+            #setattr(self.config,"schem",schem)
             self.createDictFromSchem(self.config)
             self.createTest(self.config) 
-        else: #MULTITEST
+        else: #MULTITEST TODO
             for test in self.config.tests: #create all tests in the test config
                 self.createDictFromSchem(test)
                 createTest(test) 
@@ -91,6 +93,16 @@ class maestro:
                 self.ws.mae.SetAnalysis(test.name, analysis.type , #Add Test Analysis within Maestro
                                     session = self.session, options = analysis.options)
 
+            if(hasattr(test,"sim_options")): #sim options
+                self.ws.mae.SetSimOption(test.name,session = self.session, options = test.sim_options)
+            
+            self.asi_session = self.ws.mae.GetTestSession(test.name)
+            if(hasattr(test,"high_sim_options")): #sim options
+                for option in test.high_sim_options:
+                    if(len(option) <2): continue #skip bad options
+                    [varName, val] = option
+                    self.ws.asi.SetHighPerformanceOptionVal(self.asi_session, varName,val)
+            
             self.x_mainSDB = self.ws.axl.GetMainSetupDB( self.session )
 
             #self.ws.sev.AddExpression(self.session,"ocean","") #ocean scripts broken
@@ -129,7 +141,7 @@ class maestro:
         #if type is an array then sweep those values but for now assume 1 sweeping pin type.
         if(self.equationDict.get(equation.type) is not None):
             for pin in self.equationDict.get(equation.type):#TODO MOVE FOR LOOP TO CREATE EQUATIONS?!?!
-                tempDict = self.equationDict
+                tempDict = self.equationDict.copy() #MAKE COPY
                 tempDict.update({equation.type:pin}) #TODO add linked varriables
                 expression = equation.equation.format(**tempDict) 
                 name = equation.name.format(**tempDict)
@@ -158,8 +170,10 @@ class maestro:
     def createDictFromSchem(self,test): #auto run after loading schem
         schematic = self.getSchematic(test)
         #add pintypes
+        #Error in finding DUT inst despite building?
+        #schematic.findDUT() #cant run without error
         
-        self.equationDict.update({"DUT":schematic.DUTinst.name}) #add linked varriables
+        self.equationDict.update({"DUT":schematic.DUTname}) #add linked varriables
 
         for pin in schematic.evaluatedPins:
             if pin.type is not None:
@@ -184,7 +198,10 @@ class maestro:
         pass
     
     def open(self):
-        self.session = self.ws.mae.OpenSetup(self.lib, self.cell,self.view) #create new maestro view
+        if(self.build): #if build then destroy (TODO rename to clean build?)
+            self.session = self.ws.mae.OpenSetup(self.lib, self.cell,self.view,mode="w") #create new maestro view and overwrite old one
+        else:
+            self.session = self.ws.mae.OpenSetup(self.lib, self.cell,self.view,mode="a")
     def close(self):
         self.ws.mae.SaveSetup(session = self.session)
         self.ws.mae.CloseSession(session = self.session)

@@ -47,7 +47,7 @@ class schematic:
             pass
         else:
             self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "a") #appendmode. DONT DELETE WORK
-            self.findDUT()
+            self.findDUT()#potential break if no DUT TODO fix
             ws.db.Close(self.cv)
             #check if open and give warning if so
 
@@ -162,6 +162,22 @@ class schematic:
         box = self.DUT.b_box
         region_max_height = abs((box[1][0]) - (box[1][1]))+3#self.DUT
         region_max_width = abs((box[0][0]) - (box[1][0]))
+        DUT_Pin_Boxs = [i.b_box for i in self.DUT.shapes if i.layer_name == "pin"]
+        xMin=0
+        xMax=0
+        yMin=0
+        yMax=0
+        for box in DUT_Pin_Boxs:
+            xMin = min(box[1][0],xMin)
+            xMax = max(box[0][0],xMax)
+            yMin = min(box[1][1],xMin)
+            yMax = max(box[0][1],yMax)
+
+        region_max_height = yMax-yMin
+        region_max_width = xMax-xMin
+
+
+
         for i in range(max_region):
             region_sorted = list(filter(lambda x: x.region == i, region_removed))
             MAX_OBJ=len(region_sorted)
@@ -199,7 +215,10 @@ class schematic:
             region_max_height = max(region_max_height,box_h)
             region_max_width = max(region_max_width,box_w)
         count = 0
-        
+
+        region_max_height = region_max_height + 2
+        region_max_width = region_max_width +2 #TODO fix this
+
         #TODO FIX REGIONS TO USE INFINITE REGIONS IN FORMAT (3x3,4x4,5x5,etc.)
         #only move around planned terminals TODO change back to region as all regions terminals should be planned
         #comment region_removed = [i for i in self.Build if hasattr(i,"planned")]
@@ -240,10 +259,11 @@ class schematic:
         self.cv = cv #NOT unnecissary anymore
         
         box = self.DUT.b_box
-        x= -8 + (box[1][0])
-        y= -6 - (box[0][1])
+        [x,y] = schematic.calculateDUTSize(self.DUT)
+        [x,y] = [x/2 -2, y/2]
         dut_inst = ws.sch.CreateInst( self.cv, self.DUT, "DUT", [x,y], "R0") #place DUT TODO add code to check bounding box
         self.DUTinst = dut_inst
+        self.DUTname = dut_inst.name
         #RUN THROGUTH ALL TERMINALS
         for terminal in self.Build: #TODO add check not to load the same master twice
             pin = [p for p in self.DUT.terminals if hasattr(terminal,"label") and p.name == terminal.label]
@@ -283,7 +303,21 @@ class schematic:
             else:
                 label = terminal.name
             self.createWireForFloatingInstPin(dut_inst, terminal ,label)
+    def calculateDUTSize(DUT):
+        DUT_Pin_Boxs = [i.b_box for i in DUT.shapes if i.layer_name == "pin"]
+        xMin=0
+        xMax=0
+        yMin=0
+        yMax=0
+        for box in DUT_Pin_Boxs:
+            xMin = min(box[1][0],xMin)
+            xMax = max(box[0][0],xMax)
+            yMin = min(box[1][1],xMin)
+            yMax = max(box[0][1],yMax)
 
+        max_height = yMax-yMin
+        max_width = xMax-xMin
+        return [max_width,max_height]
     #ported from skill
     def createWireForFloatingInstPin(self,inst,ter,myLabel): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(ter.pins[0].fig.bBox, inst.transform)
