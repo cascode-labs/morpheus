@@ -7,6 +7,14 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+## [0.1.7] - 2024-7-12
+### Added
+- Added Simulation Options
+
+### Changed
+
+
 ## [0.1.2] - 2024-1-10
 ### Added
 - Added Config file searching

@@ -172,7 +172,6 @@ class maestro:
         #add pintypes
         #Error in finding DUT inst despite building?
         #schematic.findDUT() #cant run without error
-        
         self.equationDict.update({"DUT":schematic.DUTname}) #add linked varriables
 
         for pin in schematic.evaluatedPins:

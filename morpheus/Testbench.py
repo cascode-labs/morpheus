@@ -14,11 +14,13 @@ class testbench:
         self.schematic = None
         self.maestro = None
         self.pin_list = None
-
+        testbench_Dict = dict
+        #tempDict = self.equationDict.copy() #MAKE COPY
+        
     def GUI_Menu(): #method for handling the gui
         pass
 
-    def loadConfigFile(self,Config configFile):
+    def loadConfigFile(self,configFile):
 
         self.equationDict = {
             "DUT" : "DUT" #test.schem.DUT.name
