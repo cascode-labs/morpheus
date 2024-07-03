@@ -64,7 +64,7 @@ class Terminal:
                 if(inst.name == "wire"): #WIRE SPECIAL CASE
                     mywire = ws.sch.CreateWire(cv, "draw", "full", position, 0.0625, 0.0625, 0.0)
                     if(hasattr(inst,"label") and hasattr(self,"label")):
-                        ws.sch.CreateWireLabel(cv, mywire[0], [position[0][0] + 0.0325,position[0][1] + 0.05], inst.label.format(**self.dictionary), "upperLeft", "R90", "stick", 0.0625, True)
+                        ws.sch.CreateWireLabel(cv, mywire[0], [position[0][0] + 0.0325,position[0][1] + 0.05], inst.label.format(**self.dictionary), "upperLeft", "R90", "stick", 0.0625, False)
                 else:
                     symbol = Terminal.getInst(ws,inst)
                     name = self.config.name + "_" + inst.name #TODO BETTER NAMING SYSTEM
