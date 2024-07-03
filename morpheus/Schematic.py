@@ -26,6 +26,8 @@ class schematic:
         self.lib = lib
         self.terminals = dict()
         self.instances = dict()
+        self.gridSize = self.ws.sch.GetEnv("schSnapSpacing") #used for snapping everything to grid
+
         self.evaluatedPins = list()
         if(hasattr(self.config,"cell")):
             self.cell = self.config.cell
@@ -176,7 +178,7 @@ class schematic:
         region_max_height = yMax-yMin
         region_max_width = xMax-xMin
 
-
+        gridSize = self.ws.sch.GetEnv("schSnapSpacing")
 
         for i in range(max_region):
             region_sorted = list(filter(lambda x: x.region == i, region_removed))
@@ -192,6 +194,7 @@ class schematic:
             ratio = 8
             x = 0
             y = 0
+            #calculate spacing for regions
             while(len(region_sorted) > 0):
                 #if(avail_h > .1):
                 
@@ -201,17 +204,17 @@ class schematic:
                 else:
                     region_sorted = sorted(region_sorted, key=lambda x: x.width, reverse=False)
                     x = 0
-                    y += term.height #TODO
+                    y += schematic.ceilByInt(term.height,gridSize) #TODO
                 term = region_sorted.pop()
 
-                box_w = max(x,box_w)
-                box_h = max(y,box_h)
+                box_w = schematic.ceilByInt(max(x,box_w),gridSize)
+                box_h = schematic.ceilByInt(max(y,box_h),gridSize)
                 #x = box_w #TODO
                 #avail_h = 
                
                 term.plan([x,y])
 
-                x += term.width
+                x += schematic.ceilByInt(term.width,gridSize)
             region_max_height = max(region_max_height,box_h)
             region_max_width = max(region_max_width,box_w)
         count = 0
@@ -228,8 +231,8 @@ class schematic:
         #add region sizing
         for region in range(max_region):
             region_sorted = list(filter(lambda x: x.region == region, region_removed))
-            x = (region%rows)*width #TODO
-            y = math.floor(region/rows)*height #TODO
+            x = schematic.ceilByInt((region%rows)*width,gridSize) #TODO
+            y = schematic.ceilByInt(math.floor(region/rows)*height,gridSize) #TODO
 
             for term in region_sorted:
                 
@@ -261,6 +264,7 @@ class schematic:
         box = self.DUT.b_box
         [x,y] = schematic.calculateDUTSize(self.DUT)
         [x,y] = [x/2 -2, y/2]
+        [x,y] = [schematic.ceilByInt(x,self.gridSize),schematic.ceilByInt(y,self.gridSize)]
         dut_inst = ws.sch.CreateInst( self.cv, self.DUT, "DUT", [x,y], "R0") #place DUT TODO add code to check bounding box
         self.DUTinst = dut_inst
         self.DUTname = dut_inst.name
@@ -284,10 +288,11 @@ class schematic:
     #end build
 
     def findDUT(self):
-        for inst in self.cv.instances:
-            if inst.cell_name == self.DUT.cell_name:
-                self.DUTinst = inst #internal
-                return inst
+        if(self.cv.instances is not None):
+            for inst in self.cv.instances:
+                if inst.cell_name == self.DUT.cell_name:
+                    self.DUTinst = inst #internal
+                    return inst
         return None #none found        
 
     def createWireStubs(self):
@@ -319,6 +324,9 @@ class schematic:
         max_width = xMax-xMin
         return [max_width,max_height]
     #ported from skill
+    def ceilByInt(num, base):
+        return base * math.ceil(num/base)
+
     def createWireForFloatingInstPin(self,inst,ter,myLabel): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(ter.pins[0].fig.bBox, inst.transform)
 
