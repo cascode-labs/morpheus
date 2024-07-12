@@ -1,7 +1,7 @@
 from morpheus.Exceptions.ExceptionHandler import MorpheusExceptionHandler
 
 from skillbridge import Workspace
-from morpheus.Config import config
+from morpheus.Config import config, config_types
 from morpheus.Maestro import maestro
 from morpheus.GUIViewer import *
 from morpheus.TabTemplate import TabTemplate
@@ -10,22 +10,24 @@ import os
 
 class GUIController():
     MorpheusExceptionHandler()
-    def __init__(self, id) -> None:
+    def __init__(self, ws) -> None:
         self.MEH =  MorpheusExceptionHandler()
 
         self.MorpheusApp = wx.App()
         self.GUIframe = GUIViewer(None,wx.ID_ANY, "")
-        self.id = id
         self.libList = None
-        self.cellList = None
+        self.cellList = None    
 
         self.testPins = []
         self.schems = []
-
-        try:
-            self.ws = Workspace.open(self.id) #open skillbridge
-        except Exception as e:
-            self.error(e)
+        #print("id is ", self.id)
+        self.ws = ws
+        #try:
+        #    print("create ws")
+       #     self.ws = Workspace.open(self.id) #open skillbridge
+        #except Exception as e:
+        #    print("failed to create ws")
+        #    self.error(e)
 
 
     def startGUI(self):
@@ -55,11 +57,15 @@ class GUIController():
 
     def populateTests(self):
         
-        Files = os.listdir('morpheus/Test_bench_definitions/Tests')
-
-        tests = []
-        for test in Files:
-            tests.append(test[0:(len(test)-4)])
+        #Files = os.listdir('Test_bench_definitions/Tests') #TODO add check for user directories
+        Files = config.getConfigs(config_types.TEST)
+        tests = list()
+        for file in Files:
+            tests.append(file.filename)
+        
+        
+        #for test in Files:
+        #    tests.append(test[0:(len(test)-4)])
 
         self.GUIframe.sel_test.AppendItems(tests)
 
@@ -97,7 +103,7 @@ class GUIController():
                                   self.cellList[self.GUIframe.sel_dut_cell.GetSelection()],
                                   self.libList[self.GUIframe.sel_lib.GetSelection()])
 
-        test = config("Tests/"+ self.GUIframe.sel_test.GetValue() + ".yml") #Load test config YAML
+        test = config(self.GUIframe.sel_test.GetValue(),config_types.TEST) #Load test config YAML
         
         schem = self.maestro.getSchematic(test)  #Create test schematic cooresponding to YAML
         self.maestro.createConfig(test)
