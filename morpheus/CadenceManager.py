@@ -65,16 +65,17 @@ class cadenceManager:
         
         attempts = 0
 
-        while attempts < 10:
+        while attempts <= 10:
             try:
                 self.ws = Workspace.open(id)
                 self.ws['load'](command)
                 break;
             except:
+                print("failed to start ws server. Attempting again.")
                 sleep(5)
                 attempts += 1
         
-        if(attempts>=10):
+        if(attempts>10):
             print("failed to start ws server.")
             return
             

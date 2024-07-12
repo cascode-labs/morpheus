@@ -1,3 +1,6 @@
+#Work related code
+work_related/
+
 # SKILL
 **/.skillide.*
 *.ils~
@@ -7,6 +10,7 @@ tests/lint_reports
 #Cadence
 tests/.tmp*
 tests/logs_*
+tests/.cadence/*
 morpheus/tests/.cadence/dfII/history/
 
 # Byte-compiled / optimized / DLL files

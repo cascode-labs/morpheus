@@ -41,7 +41,7 @@ config_dict_types = {
 }
 
 
-class config:
+class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/64587958/yaml-constructor-constructorerror-while-constructing-a-python-object-cannot-fin
     path_locations = list()
     userConfig = None
     types = dict()
@@ -122,9 +122,10 @@ class config:
         morpheus_home =  os.path.join(user_home,".morpheus")
         
         filename = os.path.join(morpheus_home,"user.sysm.yml");
-
+        os.makedirs(os.path.dirname(filename), exist_ok=True) #create morpheus directory if not already
         with open(filename, 'w') as outfile:
-            yaml.dump(config.userConfig, outfile, default_flow_style=False)
+            yaml.dump(config.userConfig, outfile, default_flow_style=False)#,transform=strip_python_tags)
+
 
     def addDir(dir):
         config.loadUserConfig();
@@ -153,8 +154,9 @@ class config:
                             if( file_type_part == "." + config_dict_types[file_type]):
                                 with open(filepath, 'r') as file:
                                     config_temp = config()
+                                    config_temp = yaml.load(file)
                                     #data = yaml.safe_load(file) #cleaner solution?
-                                    config_temp.__dict__.update(json.loads(json.dumps(yaml.load(file,Loader=SafeLoaderIgnoreUnknown)), object_hook=load_object).__dict__)
+                                    #config_temp.__dict__.update(json.loads(json.dumps(yaml.load(file,Loader=SafeLoaderIgnoreUnknown)), object_hook=load_object).__dict__)
                                     config_temp.filename = file_name_part
                                     configs.append(config_temp);
                         except Exception as e:
@@ -168,3 +170,11 @@ class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
 SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
 #path_locations = list(os.path.join(script_dir, "Test_bench_definitions"), os.path.join(morpheus_home,"testbenches"))
+def strip_python_tags(s):
+    result = []
+    for line in s.splitlines():
+        idx = line.find("!!python/")
+        if idx > -1:
+            line = line[:idx]
+        result.append(line)
+    return '\n'.join(result)

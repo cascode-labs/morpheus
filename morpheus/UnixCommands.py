@@ -4,6 +4,17 @@ from morpheus.Maestro import maestro
 from morpheus.Schematic import schematic
 
 
+# Unix command structure
+#   ex:"morpheus MODULE COMMAND"
+# MODULES TO CALL:
+#   Schematic
+#   Maestro
+# Commands will be non specific to module such as:
+#   ex:"morpheus schematic build" and "morpheus maestro build" 
+#   build
+#   add
+#   evaluate
+
 def UnixCommands(ws,args):
 
     #--adddir command 

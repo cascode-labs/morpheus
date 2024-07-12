@@ -5,7 +5,7 @@ from lxml import objectify, etree
 from xml.dom import minidom 
 import os
 
-class PlottingTemplate:
+class plottingTemplateManager:
     def __init__(self,ws,lib,cell,view) -> None: #for pin terminals
         self.ws = ws
         self.lib = lib

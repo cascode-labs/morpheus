@@ -1,0 +1,30 @@
+#Created by Jonathan Hess 6/17/24
+name: "switch"
+type: "terminal"
+width: 0.5
+height: 1
+Insts:  
+  - name: "sp1tswitch"
+    lib: "analogLib"
+    instance: "SW_{name}"
+    rotation: 90
+    position: 
+      - 0
+      - -0.1875
+    parameters:
+      "paramTyp": "string"
+      "icPosition_str": "{name}"
+      "tranPosition_str": "{name}"
+      "dcPosition_str": "{name}"
+      "position_str": "{name}"
+      "acPosition_str": "{name}"
+      #"orient": "R90"
+      
+  - name: "gnd"
+    lib: "analogLib"
+    instance: "{name}_gnd"
+    position: [0,-0.375]
+
+  - name: "wire"
+    label: "{name}"
+    position: [[0,0],[0,0.375]]

@@ -5,7 +5,7 @@ Terminals:
   - name: "vss"
     type: "vss"
     term: "dc"
-    pattern: "vss"
+    pattern: "vss|gnd"
     region: 0
     #parameters:
     #  vdc: "vss"
@@ -19,25 +19,19 @@ Terminals:
   - name: "postive"
     type: "postive"
     term: "dc"
-    pattern: "v2"
+    pattern: "v2|VinP"
     region: 0
 
   - name: "negative"
     type: "negative"
     term: "dc"
-    pattern: "v1"
-    region: 0
-
-  - name: "postive"
-    type: "postive"
-    term: "dc"
-    pattern: "v2"
+    pattern: "v1|VinN"
     region: 0
 
   - name: "output"
     type: "output"
     term: "dc"
-    pattern: "vo"
+    pattern: "vo|Vout"
     region: 0
   
 Modules:
