@@ -7,13 +7,22 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-## [0.1.7] - 2024-7-12
-### Added
-- Added Simulation Options
 
+## [Unreleased]- 2024-8-2
+### Added
 ### Changed
 
+
+## [0.2.0] - 2024-7-12
+### Added
+- Added Simulation Options
+- Added Cadence Manager
+
+### Changed
+- Fixed DUT bounding box spacing
+- Updated PinType Dictionary to allow for equations to use arrays
+- Skillbridge ID Assignment
+- Fixed grid placement
 
 ## [0.1.2] - 2024-1-10
 ### Added
