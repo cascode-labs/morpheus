@@ -323,10 +323,11 @@ class schematic:
         max_height = yMax-yMin
         max_width = xMax-xMin
         return [max_width,max_height]
-    #ported from skill
+    
     def ceilByInt(num, base):
         return base * math.ceil(num/base)
-
+    
+    #ported from skill
     def createWireForFloatingInstPin(self,inst,ter,myLabel): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(ter.pins[0].fig.bBox, inst.transform)
 
@@ -373,5 +374,5 @@ class schematic:
             lab_x=x1
             lab_y=y1+0.04
         mywire=self.ws.sch.CreateWire(self.cv, "draw", "full", wireDir, 0.0625, 0.0625, 0.0)
-        self.ws.sch.CreateWireLabel(self.cv , mywire[0], [lab_x,lab_y], myLabel, "upperLeft" ,dir ,"stick" ,0.0625 ,True)
+        self.ws.sch.CreateWireLabel(self.cv , mywire[0], [lab_x,lab_y], myLabel, "upperLeft" ,dir ,"stick" ,0.0625 ,False)
         return [dir,wireDir]

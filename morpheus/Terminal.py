@@ -32,6 +32,8 @@ class Terminal:
         #    self.net = 'gnd!'
         if(hasattr(self.term, "label")):
             self.net = self.term.label
+        #if(hasattr(self.term, "net")):
+        #    self.net = self.term.net
 
     def plan(self,position):
         self.position = position
