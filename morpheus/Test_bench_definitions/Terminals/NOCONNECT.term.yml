@@ -6,6 +6,6 @@ height: 0
 Insts: 
   - name: "noConn"
     lib: "basic"
-    instance: "{name}_noConn"
+    instance: "{label}_noConn"
     position: [0,-0.375]
 

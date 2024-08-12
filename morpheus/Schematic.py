@@ -15,7 +15,12 @@ class DUT_pin:
         self.pin  = pin
         self.label = pin
         self.type = ""
-    
+class plan_region:
+    def __init__(self,x,y,height,width) -> None:
+            self.x  = x
+            self.y  = y
+            self.height = height
+            self.width = width
 class schematic:
 
     def __init__(self,ws,lib,DUT,config, tconfig) -> None:
@@ -107,8 +112,9 @@ class schematic:
     def evaluate(self):
         #match pin names to terminals defined in the PLAN section of schematic config
         #for(term in self.config.Build):
-        logger.info("Starting evaulation for DUT pins")    
-        for pin in self.DUT.terminals: 
+        logger.info("Starting evaulation for DUT pins")
+        
+        for pin in self.DUT.terminals: # go through all terminals on DUT
             inst = DUT_pin(pin.name) #contains default values
             term = Terminal(pin)
             for pin_type in self.config.Terminals:
@@ -146,11 +152,15 @@ class schematic:
                     self.evaluatedPins.append(term)
 
     def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN
+        self.regions = list()
+
         max_region = 4
-        if(hasattr(self.config,"Build")):
+        if(hasattr(self.config,"Build")): #DEFAULTS
             self.Build = self.config.Build
         else:
             self.Build = list() #reset build list (look at (and append) Config Build?)
+
+        
         #create Dict for all pin types in schematic
         pin_types = {self.config.Terminals[i].type: self.config.Terminals[i] for i in range(len(self.config.Terminals))} 
         #only plan pins that have been evaluated
@@ -179,7 +189,9 @@ class schematic:
         region_max_width = xMax-xMin
 
         gridSize = self.ws.sch.GetEnv("schSnapSpacing")
-
+        #TODO TEMP VARS
+        region_x =0
+        region_y = 0
         for i in range(max_region):
             region_sorted = list(filter(lambda x: x.region == i, region_removed))
             MAX_OBJ=len(region_sorted)
@@ -215,6 +227,11 @@ class schematic:
                 term.plan([x,y])
 
                 x += schematic.ceilByInt(term.width,gridSize)
+            region = plan_region(region_x,region_y, box_h,box_w)
+            #region_x += box_w
+
+            self.regions.append(region) #add height/width of region
+
             region_max_height = max(region_max_height,box_h)
             region_max_width = max(region_max_width,box_w)
         count = 0
@@ -275,7 +292,8 @@ class schematic:
                 dir = self.createWireForFloatingInstPin(dut_inst, pin[0] ,terminal.net)
                 #self.ws['CCSCreateWireForFloatingInstPin'](cv,dut_inst, pin[0] ,terminal.label) #TODO make work with no pin heads (also make part of python rather than skill)
             terminal.build(ws,self.cv,dir)
-
+        for region in self.regions:
+            self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [[region.x,region.y], [region.x + region.width, region.y + region.height]] )
         if(hasattr(self.tconfig, 'scriptpath')): #If custom script is provided, run the script
             ws['load'](self.tconfig.scriptpath)
             ws[self.tconfig.script](self.cv)
@@ -292,6 +310,7 @@ class schematic:
             for inst in self.cv.instances:
                 if inst.cell_name == self.DUT.cell_name:
                     self.DUTinst = inst #internal
+                    self.DUTname = inst.name
                     return inst
         return None #none found        
 

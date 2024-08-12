@@ -66,7 +66,7 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
                                 self.__dict__.update(json_load)
                                 #if config_dict_types[self.type] != file_type:
                                 #    continue
-                                print(f"{self.name} {self.type} loaded from {filepath}")
+                                print(f"{self.name} {file_type} loaded from {filepath}")
                                 self.success = True
                                 return
                         except Exception as e:

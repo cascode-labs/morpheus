@@ -115,6 +115,8 @@ class maestro:
                 
             if(hasattr(test,"equations")):   
                 self.createEquations(test)
+           # if(hasattr(test,"ocean")):   
+            #    self.createOceanScripts(test)
             #self.addOceanScripts(test)
 
 
@@ -148,8 +150,36 @@ class maestro:
                 self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)#TODO CHECK IF EXISTS AND UPDATE
 
      #def recursiveFormat():
+    def createOceanScripts(self,test):
+        for script in test.ocean: #create all requred scripts
+            self.createOceanScript(test, script)
+
+    def createOceanScript(self,test,script):
+        #self.x_mainSDB
+        #window = self.ws.axl.GetWindowSession()
+        #form = self.ws.__.axlOutputsForm28
+        num = re.findall(r'\d+', self.session)[0]
+
+        #form = getattr(self.ws.__,"axlOutputsForm"+num)
+
+        my_globals = self.ws.globals("")
+        self.ws["morpheus_maeAddOceanMeasurement"](self.session)
+        #form = self.ws['axlOutputsForm'+ num]
+        #widtget =  self.ws["symeval"](form,"axlOutputsWidget"+num)
+        widtget= "axlOutputsWidget" + num  #"axlOutputsForm"+num+"->"+"axlOutputsWidget" + num
+        self.ws["_axlOutputsSetupAddOutputByType"](widtget, "ocean", test.name)
+        self.ws["describe"](form)
+        form = self.ws.__['axlOutputsForm'+num]
+        print(dir(form))
+        print(form._attributes)
+        #widtget = self.ws.__['axlOutputsForm'+num]['axlOutputsWidget'+num]
+        self.ws["_axlOutputsSetupAddOutputByType"](widtget, "ocean", test.name)
+        self.ws["_axlOutputsSetupAddOutputByType(axlOutputsForm"+num+"axlOutputsForm"+num+"->"+"axlOutputsWidget" + num+ "'ocean' '"+test.name+"')"]
+        #self.ws["_axlOutputsSetupAddOutputByType"](getattr(getattr(my_globals, "axlOutputsForm"+num), "axlOutputsWidget"+num), "ocean", test.name)
 
 
+        self.ws["print"]("hello")
+#_axlToolSetOutputExpr("SESSION" "TESTNAME" 16 "SCRIPT LOCATION")
     def createSignals(self,test):
         for signal in test.signals: #create all requred signals
             self.createSignal(test, signal)

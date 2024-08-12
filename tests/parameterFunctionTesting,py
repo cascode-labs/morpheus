@@ -1,0 +1,24 @@
+class Object(object):
+    pass
+def object_parameter_getter(obj,parameter):
+    #print(obj.__dict__.get())
+    print(getattr(obj,parameter))
+def object_parameter_getter2(obj,parameter_heir):
+    #print(obj.__dict__.get())
+    parameters = parameter_heir.split(".")
+    obj_rec = obj
+    for parameter in parameters:
+        print(getattr(obj_rec,parameter))
+        obj_rec = getattr(obj_rec,parameter)
+    print("final")
+    print(obj_rec)
+foo = Object()
+bar = Object()
+foo.text = "HELLO WORLD"
+bar.text = "HELLO WORLD"
+foo.bar = bar
+
+object_parameter_getter(foo,"text")
+object_parameter_getter2(foo,"bar.text")
+object_parameter_getter2(foo,"text")
+print("Goodbye")

@@ -1,0 +1,36 @@
+#Created by Jonathan Hess 7/30/24
+
+instance: V_{name}
+name: V_{name}
+
+type: "terminal"
+width: 0.5
+height: 1.5
+
+lib: "analogLib"
+cell: "vdc"
+#terminal_types:
+terminals_types:
+  - type: "MINUS" #type that is used in dicionary such as VDC.MINUS
+    pattern: "MINUS" #used to find the terminal "MINUS"
+    cell: "gnd" #CADENCE CELLNAME
+    lib: "analogLib" #CADENCE LIBARARY
+    instance: "{name}_gnd" #INSTANCE DEFAULT NAMING SCHEME
+    position: [0,-0.375] #LOCATION (will not be needed evenetualy)
+
+  - type: "PLUS"
+    pattern: "PLUS"
+    name: "wire"
+    label: "{name}"
+    position: [[0,0],[0,0.375]]
+
+    
+insts:   
+  - name: "gnd"
+    lib: "analogLib"
+    instance: "{name}_gnd"
+    position: [0,-0.375]
+
+  - name: "wire"
+    label: "{name}"
+    position: [[0,0],[0,0.375]]

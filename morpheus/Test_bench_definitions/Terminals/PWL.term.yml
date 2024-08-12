@@ -1,23 +1,23 @@
 #Created by Jonathan Hess 5/30/23
 name: "PWL"
-type: "terminal"
+#type: "terminal"
 width: 0.5
-height: 1
+height: 1.5
 Insts:
   - name: "vpwlf"
     lib: "analogLib"
-    instance: "V_{name}"
+    instance: "V_{label}"
     position: 
       - 0
       - 0
     parameters:
-      "fileName": "{name}_PATH"
+      "fileName": "{label}_PATH"
     
   - name: "gnd"
     lib: "analogLib"
-    instance: "{name}_gnd"
+    instance: "{label}_gnd"
     position: [0,-0.375]
 
   - name: "wire"
-    label: "{name}"
+    label: "{label}"
     position: [[0,0],[0,0.375]]

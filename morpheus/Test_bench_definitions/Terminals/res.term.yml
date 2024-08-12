@@ -1,21 +1,21 @@
 #Created by Jonathan Hess 5/31/23
 name: "RES"
-type: "terminal"
+#type: "terminal"
 width: 0.5
-height: 1
+height: 1.5
 Insts:
   - name: "res"
     lib: "analogLib"
-    instance: "{name}_res"
+    instance: "{label}_res"
     position: [0,0]
     parameters:
       "r": "{name}"
     
   - name: "gnd"
     lib: "analogLib"
-    instance: "{name}_gnd"
+    instance: "{label}_gnd"
     position: [0,-0.375]
 
   - name: "wire"
-    label: "{name}"
+    label: "{label}"
     position: [[0,0],[0,0.375]]

@@ -1,19 +1,19 @@
 #Created by Jonathan Hess 6/5/23
 name: "vpulse"
-type: "terminal"
+#type: "terminal"
 width: 0.5
 height: 1
 Insts:  
   - name: "vpulse"
     lib: "analogLib"
-    instance: "V_{name}"
+    instance: "V_{label}"
     position: 
       - 0
       - 0
     parameters:
-      "vdc": "{name}"
+      "vdc": "{label}"
       "v1": "0"
-      "v2": "{name}"
+      "v2": "{label}"
       "per": "0"
       "td": "0"
       "tr": "100n"
@@ -21,9 +21,9 @@ Insts:
       
   - name: "gnd"
     lib: "analogLib"
-    instance: "{name}_gnd"
+    instance: "{label}_gnd"
     position: [0,-0.375]
 
   - name: "wire"
-    label: "{name}"
+    label: "{label}"
     position: [[0,0],[0,0.375]]
