@@ -45,55 +45,31 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
     path_locations = list()
     userConfig = None
     types = dict()
-    def __init__(self,configName=None,file_type=None):
+    def __init__(self,configName=None,file_type=None,filepath=None):
+        if(filepath is not None):
+            self.loadFile(filepath)
+            return
         if(configName == None):
             return
         if(len(config.path_locations) == 0):
             config.getPaths()
         filename = configName + "." + config_dict_types[file_type] + ".yml" #create filename
 
-        print("Finding "+ filename)
-        for path in config.path_locations:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    if file == filename:
-                        filepath = os.path.join(root, file)
-                        try:
-                            with open(filepath, 'r') as file:
-                                #data = yaml.safe_load(file) #cleaner solution?
-                                yaml_load = yaml.load(file,Loader=SafeLoaderIgnoreUnknown)
-                                json_load = json.loads(json.dumps(yaml_load), object_hook=load_object).__dict__
-                                self.__dict__.update(json_load)
-                                #if config_dict_types[self.type] != file_type:
-                                #    continue
-                                print(f"{self.name} {file_type} loaded from {filepath}")
-                                self.success = True
-                                return
-                        except Exception as e:
-                            print(f"Error loading {filename}: {e}")
-        print("Could not find "+ filename + " in paths");
-        self.success = False;
-        raise FileNotFoundError
-        #except:
-        #    print("failed to load")
-    def parseType(input):
-        config_types[input];
-        
-        return type;    
+        matching_files = config.searchFiles(name=configName,file_type=file_type)
+        if(len(matching_files) > 1):
+            print("WARNING MULTIPLE FILES FOUND USING", matching_files[0])
+        self.loadFile(matching_files[0]) 
     
     def getPaths():
         user_home = os.path.expanduser('~')
         morpheus_home =  os.path.join(user_home,".morpheus")
-        
         config.path_locations.append(os.path.join(script_dir, "Test_bench_definitions"))
         config.path_locations.append(morpheus_home)
-
         config.loadUserConfig() #load user.yml file if not already loaded
 
-            
-        if(config.userConfig.success):
-            for path in config.userConfig.paths: #add all user's paths to path locations
-                    config.path_locations.append(path)
+        #if(config.userConfig is not None):
+        for path in config.userConfig.paths: #add all user's paths to path locations
+                config.path_locations.append(path)
 
     def loadUserConfig():
         #TODO add check if success? reduce loads from file
@@ -115,8 +91,6 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
         config.userConfig.paths = list()
         config.saveUserConfig() #save!
 
-        config.userConfig.success = False #add that not successful after saving new user config
-
     def saveUserConfig():
         user_home = os.path.expanduser('~')
         morpheus_home =  os.path.join(user_home,".morpheus")
@@ -126,7 +100,6 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
         with open(filename, 'w') as outfile:
             yaml.dump(config.userConfig, outfile, default_flow_style=False)#,transform=strip_python_tags)
 
-
     def addDir(dir):
         config.loadUserConfig();
         if(config.userConfig.success):
@@ -135,33 +108,43 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
         else:
             print("Failed to find load user.yml, unable to add dir\n");
 
-    def getConfigs(file_type): #TODO test as MIGHT BE BROKEN
-        configs = list()
-        
-        for path in config.path_locations:
-            logger.debug(f"Checking {path} for ",config_dict_types[file_type]);
-            print(f"Checking {path} for ",config_dict_types[file_type])
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    print("found file ", file)
-                    if(os.path.splitext(file)[1] == ".yml" ):
-                        filepath = os.path.join(root, file)
-                        
-                        try:
-                            value = os.path.splitext(os.path.splitext(file)[0])
-                            file_name_part = value[0]
-                            file_type_part = value[1]
-                            if( file_type_part == "." + config_dict_types[file_type]):
-                                with open(filepath, 'r') as file:
-                                    config_temp = config()
-                                    config_temp = yaml.load(file)
-                                    #data = yaml.safe_load(file) #cleaner solution?
-                                    #config_temp.__dict__.update(json.loads(json.dumps(yaml.load(file,Loader=SafeLoaderIgnoreUnknown)), object_hook=load_object).__dict__)
-                                    config_temp.filename = file_name_part
-                                    configs.append(config_temp);
-                        except Exception as e:
-                            print(f"Error loading {filepath}: {e}")
-        return configs
+    def searchFiles(name=None,filename = None, file_type = None):
+        matching_files = list()
+        file_type =  config_dict_types[file_type]
+        if(filename is not None):
+            print("Finding "+ filename)
+        elif(name is not None):#TODO CHECK FILETYPE
+            filename = name + "." + file_type + ".yml" #create filename
+            print("Finding "+ filename)
+        else:
+            print("Finding configs of type" + file_type)
+
+        for path in config.path_locations: #search locations 
+            for root, dirs, files in os.walk(path): #into subfolders
+                for file in files: #check all files
+                    #check filetype
+                    value = os.path.splitext(os.path.splitext(file)[0])
+                    file_name_part = value[0]
+                    file_type_part = value[1][1:] #remove leading dot "."
+                    if(file_type_part == file_type):
+                        if(filename ==None or filename == file):#only checking for filetype or filename matches
+                            filepath = os.path.join(root, file)
+                            matching_files.append(filepath)
+        if len(matching_files) ==0:
+            print("Could not find file")
+            raise FileNotFoundError
+
+        return matching_files
+
+    def loadFile(self,filepath):
+        with open(filepath, 'r') as file:
+            yaml_load = yaml.load(file,Loader=SafeLoaderIgnoreUnknown)
+            json_load = json.loads(json.dumps(yaml_load), object_hook=load_object).__dict__
+            self.__dict__.update(json_load)
+            value = os.path.splitext(os.path.splitext(filepath)[0])
+            file_type_part = value[1][1:] #remove leading dot "."
+            print(f"{self.name} {file_type_part} loaded from {filepath}")
+
     
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):

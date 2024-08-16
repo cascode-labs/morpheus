@@ -35,11 +35,24 @@ class GUIViewer(wx.Frame):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
         self.panel_main = wx.Panel(self, wx.ID_ANY, style=wx.BORDER_SIMPLE)
-
+        
+        rows = 3
+        #1) CONFIG FILE
+        #2) Testbench File
+        #3) RUN BUTTON
+        self.header = wx.FlexGridSizer(4, 1, 0, 0)
         grid_sizer_1 = wx.FlexGridSizer(4, 1, 0, 0)
 
         grid_sizer_2 = wx.FlexGridSizer(3, 2, 0, 0)
         grid_sizer_1.Add(grid_sizer_2, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
+
+
+#GET CONFIG FILES SELECTION
+        configs_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Config File")
+        grid_sizer_2.Add(configs_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        #self.configs_sel = wx.ComboBox(self.panel_main, wx.ID_ANY, style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        #configs_sel.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.populateCells)
 
         sellib_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Testbench Library")
         grid_sizer_2.Add(sellib_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)

@@ -5,7 +5,8 @@ from time import sleep
 from skillbridge import Workspace
 from morpheus.CadenceManager import cadenceManager
 
-
+import signal
+import sys
 
 
 
@@ -133,7 +134,7 @@ def get_username():
 
 
 
-
+global_ws = None
 def main(morph_args: list | None = None):
 
     #old parser code
@@ -184,6 +185,7 @@ def main(morph_args: list | None = None):
     #create cadence instance
     manager = None
     try:
+        print(f'Attempting to connect to SkillBridge with ID {id}')
         logger.info(f'Attempting to connect to SkillBridge with ID {id}')
         ws = Workspace.open(id) #create ws in main rather than in GUI or elsewhere
         ws["print"]("Hello World! Morpheus has started!\n")
@@ -214,9 +216,9 @@ def main(morph_args: list | None = None):
             config.getPaths()#Get paths for tests
             Controller = GUIController(ws)
             Controller.startGUI()
-    except:
+    except Exception as e:
         print("Error in execution closing morpheus");
-    
+        print(e)
     
     #TODO move to before the unix options and GUI 
     if(manager is not None): #we created a cadence instance! Keep it going with 5 minute timeout
@@ -226,6 +228,18 @@ def main(morph_args: list | None = None):
         else:
             print("Thanks for using Morpheus! Cadence with Skillbridge will be running in the background until timeout!")
             os._exit(os.EX_OK)
+print("RUNNING MORPHEUS")
+#ws["print"]("RUNNING MORPHEUS")
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    global_ws["print"]("CNTRLC MORPHEUS DIE")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
 
 main()
+
+
 

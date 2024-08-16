@@ -84,6 +84,7 @@ class instance:
                     config = terminal_type
                     terminal = instance(self.ws,terminal_type,self.global_dict)
                     terminal.label = match.name
+                    terminal.cadence_term = match
                     #terminal.evaluate() #Dont need to evaluate created terminals
                     self.terminals.append(terminal)
 
@@ -114,6 +115,7 @@ class instance:
             if(self.location == None): #should be top level
                 self.symbol = self.ws.db.open_cell_view(self.lib,self.cell,"symbol")
                 self.calculateInstSize()
+                #add wires
             for terminal in self.terminals:
                 terminal.plan()
         
@@ -178,8 +180,12 @@ class instance:
 
 
     def build(self,cv,dir,xoffset,yoffset,gridSize):
+
+
+
         oldx = self.x
         oldy = self.y
+        self.cv = cv
         self.x = schematic.ceilByInt(xoffset + self.x + self.width/2 - self.x_offset,gridSize)
         self.y = schematic.ceilByInt(yoffset + self.y + self.height/2 - self.y_offset,gridSize)
         #TODO add special case for no connect
@@ -234,5 +240,59 @@ class instance:
                     if(hasattr(inst,"rotation")):
                         rotation = "R" + str(inst.rotation)   
                     new_inst = self.ws.db.CreateParamInst(cv, symbol, name, position, rotation,1,prop) #create instance with parameters
+
             #end For Loop per Instance
         #end For Loop per Terminal
+        self.inst = new_inst
+        if(hasattr(self,"terminals")):
+            for term in self.terminals:
+                self.createWireForFloatingInstPin(term)
+
+    def createWireForFloatingInstPin(self,term): #TODO fix issue with no pin wires
+        instTermbBox = self.ws.db.TransformBBox(term.cadence_term.pins[0].fig.bBox, self.inst.transform)
+
+        xa = instTermbBox[0][0]
+        xb = instTermbBox[1][0]
+        ya = instTermbBox[0][1]
+        yb = instTermbBox[1][1]
+        x1 = (xa + xb)/2
+        y1 = (ya + yb)/2
+        dir = "R0"
+        wireDir=[[x1,y1], [x1+0.3,y1]]
+        lab_x=x1+0.04
+        lab_y=y1
+        try:
+            selBox = [pin for pin in self.inst.master.shapes if pin.lpp == ['instance', 'drawing'] ]
+            ibox=self.ws.ge.TransformUserBBox(selBox[0].b_Box, self.inst.transform)
+        except IndexError:
+            raise SelectionBoxException #No selection box in symbol
+        
+
+        left_E = ibox[0][0]
+        right_E=ibox[1][0]
+        top_E=ibox[1][1]
+        bot_E= ibox[0][1]
+        grid=2*self.ws.sch.GetEnv("schSnapSpacing")
+        if x1-grid < left_E:
+            dir="R180"
+            wireDir=[[x1,y1] ,[x1-0.3,y1]]
+            lab_x=x1-0.04
+            lab_y=y1
+        elif x1+grid > right_E:
+            dir="R0"
+            wireDir= [[x1,y1] ,[x1+0.3,y1]]
+            lab_x=x1+0.04
+            lab_y=y1
+        elif y1-grid < bot_E:
+            dir="R270"
+            wireDir=[[x1,y1] ,[x1,y1-0.3]]
+            lab_x=x1
+            lab_y=y1-0.04
+        elif y1+grid > top_E:
+            dir="R90"
+            wireDir=[[x1,y1] ,[x1,y1+0.3]]
+            lab_x=x1
+            lab_y=y1+0.04
+        mywire=self.ws.sch.CreateWire(self.cv, "draw", "full", wireDir, 0.0625, 0.0625, 0.0)
+        self.ws.sch.CreateWireLabel(self.cv , mywire[0], [lab_x,lab_y], term.label, "upperLeft" ,dir ,"stick" ,0.0625 ,False)
+        return [dir,wireDir]

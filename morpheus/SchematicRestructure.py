@@ -228,9 +228,6 @@ class schematic:
             return
         
         for region in self.regions:
-        #if(1==1):
-            #region = self.regions[2]
-            #region.build()
             region_x1 = region.x + region.width;
             region_x2 = region.x;
             region_y1 = region.y + region.height;
@@ -245,27 +242,13 @@ class schematic:
                 box_y2 = y+ subregion.height
                 self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [ [box_x2, box_y2],[box_x1,box_y1]] )
                 for inst in subregion.instances:
-
                    inst.build(self.cv,0,x,y,self.gridSize)
-        
-        
-        #if(hasattr(self.tconfig, 'scriptpath')): #If custom script is provided, run the script
-        #    ws['load'](self.tconfig.scriptpath)
-        #    ws[self.tconfig.script](self.cv)
+
         self.ws.db.Check(self.cv) 
         self.ws.db.Save(self.cv)
         self.ws.db.Close(self.cv)
         logger.info("Finished building schematic")
     #end build
-
-    def findDUT(self):
-        if(self.cv.instances is not None):
-            for inst in self.cv.instances:
-                if inst.cell_name == self.DUT.cell_name:
-                    self.DUTinst = inst #internal
-                    self.DUTname = inst.name
-                    return inst
-        return None #none found        
 
     def createWireStubs(self):
         dut_inst = self.findDUT()
@@ -280,21 +263,6 @@ class schematic:
             else:
                 label = terminal.name
             self.createWireForFloatingInstPin(dut_inst, terminal ,label)
-    def calculateDUTSize(DUT):
-        DUT_Pin_Boxs = [i.b_box for i in DUT.shapes if i.layer_name == "pin"]
-        xMin=0
-        xMax=0
-        yMin=0
-        yMax=0
-        for box in DUT_Pin_Boxs:
-            xMin = min(box[1][0],xMin)
-            xMax = max(box[0][0],xMax)
-            yMin = min(box[1][1],xMin)
-            yMax = max(box[0][1],yMax)
-
-        max_height = yMax-yMin
-        max_width = xMax-xMin
-        return [max_width,max_height]
     
     def ceilByInt(num, base):
         return base * math.ceil(num/base)

@@ -5,9 +5,6 @@ name: "RC"
 width: 0.5
 height: 2
 
-terminals:
-  - type: "RC"
-  
 
 
 Insts:
