@@ -6,6 +6,16 @@ type: "test"
 
 schematic: opamp
 
+dictionary_variables:
+- name: DUTCELL
+  type: string #defaults?
+  default: "DUTCELL"
+  options: "self.ws.dd.GetLibList()"
+- name: DUTLIB
+  type: string #defaults?
+  default: "DUTLIB"
+
+
 variables:
   - name: "VDD"
     test: [Global,TEST1,TEST2]

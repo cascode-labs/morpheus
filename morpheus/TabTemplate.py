@@ -22,20 +22,67 @@ class TabTemplate(wx.ScrolledWindow):
         self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
         
         # end wxGlade
+
+
+    def loadFromObj(self,obj_to_tab):
+        self.options = list()
+        counter = 0
+        if type(obj_to_tab) is list:
+            obj_options = {f"list{i}": obj_to_tab[i] for i in range(0, len(obj_to_tab), 1)} #it is list
+        elif(type(obj_to_tab) is not dict):
+            obj_options = obj_to_tab.__dict__ #it is an object not dictionary or list
+        else:
+            obj_options = obj_to_tab #it is dictionary
+
+        self.tab_grid = wx.FlexGridSizer(len(obj_options), 2, 0, 0) #Configure Notebook ta
+        self.tab_grid.AddGrowableCol(1)
+        print("adding props")
+
+
+        for prop in obj_options:
+            print("prop add")
+            prop_val = obj_options[prop]
+            prop_val_type = type(prop_val)
+            new_prop = gui_option(self,self.tab_grid,prop,prop_val)
+            self.options.append(new_prop)
+            self.tab_grid.AddGrowableRow(counter)
+            counter = counter +1
+    #build (do not care about where options came from)
+    def build_2(self,testbench_tabs,tab_name):
+        testbench_tabs.AddPage(self, tab_name)
+        for option in self.options:
+            option.build()
+        self.SetSizer(self.tab_grid)
+        self.Layout()
+    #BUILD FROM OBJ
     def build(self, obj_to_tab, testbench_tabs):
         tab_name = "test tab"
         #new_tab = TabTemplate(testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
         testbench_tabs.AddPage(self, tab_name)
 
-        tab_grid = wx.FlexGridSizer(len(obj_to_tab.__dict__), 2, 0, 0) #Configure Notebook ta
-        tab_grid.AddGrowableCol(1)
-        print("adding props")
+        
         counter = 0
         self.options = list()
-        for prop in obj_to_tab.__dict__:
+
+        obj_options_names = list()
+        obj_options = dict()
+
+        if type(obj_to_tab) is list:
+            obj_options = {f"list{i}": obj_to_tab[i] for i in range(0, len(obj_to_tab), 1)} #it is list
+        elif(type(obj_to_tab) is not dict):
+            obj_options = obj_to_tab.__dict__ #it is an object not dictionary or list
+        else:
+            obj_options = obj_to_tab #it is dictionary
+
+        tab_grid = wx.FlexGridSizer(len(obj_options), 2, 0, 0) #Configure Notebook ta
+        tab_grid.AddGrowableCol(1)
+        print("adding props")
+
+
+        for prop in obj_options:
             print("prop add")
 
-            prop_val = obj_to_tab.__dict__[prop]
+            prop_val = obj_options[prop]
             prop_val_type = type(prop_val)
 
             new_prop = gui_option(self,tab_grid,prop,prop_val)
@@ -92,6 +139,7 @@ class gui_option():
 
         if prop_val_type is str:
             self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+
         elif prop_val_type is bool:
             self.option = wx.CheckBox(parent,wx.ID_ANY,"yes", style=0)
         elif prop_val_type is dict or prop_val_type is list:
@@ -118,9 +166,19 @@ class gui_option():
             print(prop_val_type)
             self.option = wx.StaticText(parent, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
 
-        
+    def on_text_change(self, event):
+        current_value = self.cb.GetValue()
+        if current_value != self.cb_value and current_value not in self.combo_contents:
+            # Value has been edited
+            index = self.combo_contents.index(self.cb_value)
+            self.combo_contents.pop(index)
+            self.combo_contents.insert(index, current_value)
+            self.cb.SetItems(self.combo_contents)
+            self.cb.SetValue(current_value)
+            self.cb_value = current_value
 
-        
+    def comboUpdate(self,e):
+        pass
     def build_test(self):
         tab_grid = self.grid
         tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
@@ -138,7 +196,16 @@ class gui_option():
 #https://stackoverflow.com/questions/1952464/python-how-to-determine-if-an-object-is-iterable
 
         if prop_val_type is str:
-            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            #check for options?
+
+            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN )#| wx.CB_READONLY
+            #wx.EVT_TEXT
+            #self.option = wx.TextCtr(parent, wx.ID_ANY, style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            
+            #self.option.Bind(wx.EVT_TEXT,self.on_text_change)
+            self.option.SetValue(prop_val)
+            print(f"{prop} is set to {prop_val}")
+
         elif prop_val_type is bool:
             self.option = wx.CheckBox(parent,wx.ID_ANY,"yes", style=0)
         elif prop_val_type is dict or prop_val_type is list:

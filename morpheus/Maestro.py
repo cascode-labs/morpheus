@@ -230,15 +230,21 @@ class maestro:
 
         type_dict = {
             "string":str,
-            "int":int
+            "int": int
         }
-        
-        options = list()
-        for variable in self.varaibles:
-
-            type_of_var = type_dict[variable.type]
+        #OBJ.__dict__.update(self.__dict__)
+        temp_dict = dict()
+        #self.global_dict.
+            #         defintion = self.__dict__[key]
+            # if(isinstance(defintion, str)):
+            #     #https://stackoverflow.com/questions/28094590/ignore-str-formatfoo-if-key-doesnt-exist-in-foo
+            #     #s = Template(defintion).safe_substitute(**self.global_dict)
+                # self.__dict__[key] = defintion.format_map(OBJ.global_dict) #update config file dict with globals
+        for var in self.dictionary_variables:
+            print(f"{var.name} is type {var.type}")
+            temp_dict[var.name] = type_dict[var.type]()
+            if(hasattr(var,"default")):
+                temp_dict[var.name] = var.default
+            #type_of_var = 
             #gui_option()
-
-        self.options= {
-            
-        }
+        self.global_dict.update(temp_dict)

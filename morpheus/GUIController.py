@@ -41,11 +41,11 @@ class GUIController():
         self.GUIframe.Show()
 
         self.setBindings() # Initiate Bindings
-        #self.populateLibraries() # Populate Library drop down menu
+        self.populateLibraries() # Populate Library drop down menu
         self.populateTests()
         self.GUIframe.Size = (600,800)
         config.getPaths()
-        self.openNewTab(Config.config.userConfig)
+        #self.openNewTab(Config.config.userConfig)
         #self.openNewTab(self.maestro)
         #self.openNewTab(self.schematic_test)
         self.GUIframe.testbench_tabs.Show()
@@ -72,11 +72,17 @@ class GUIController():
             selectectConfig = self.configs[self.GUIframe.config_sel.GetSelection()] #get config file from loaded files (or just load file)
             self.maestro = maestro(self.ws,selectectConfig)
             self.maestro.gui_setup()
-            self.openNewTab(self.maestro)
+            #self.openNewTab(self.maestro.global_dict)
+            #loadFromObj
+            maestro_options_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+            maestro_options_tab.loadFromObj(self.maestro.global_dict)
+            maestro_options_tab.build_2(self.GUIframe.testbench_tabs,"maestro options")
+
+            #self.openNewTab(self.maestro)
 
             #new_config = config(filepath=selectedTest)
             #for var in new_config.variables:
-            self.addVariables(selectectConfig)
+            #self.addVariables(selectectConfig)
             #CREATE NEW BOXES FOR VARIABLES
             #lID = self.ws.dd.GetObj(selectedLib)
             #if not lID.cells is None:
@@ -148,8 +154,8 @@ class GUIController():
 
         self.libList = [lib.name for lib in self.ws.dd.GetLibList()] #Get list of available libraries
 
-        self.GUIframe.sel_lib.AppendItems(self.libList) #Append to drop downs
-        self.GUIframe.sel_dut_lib.AppendItems(self.libList) 
+        self.GUIframe.lib_sel.AppendItems(self.libList) #Append to drop downs
+        self.GUIframe.lib_sel.AppendItems(self.libList) 
 
     
     def populateCells(self,e):
