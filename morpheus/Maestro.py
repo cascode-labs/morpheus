@@ -1,7 +1,7 @@
 from morpheus.Config import *
 from morpheus.Schematic import *
 
-class maestro:
+class maestro:#test
     def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
         self.ws = ws
         self.lib = lib
@@ -21,7 +21,7 @@ class maestro:
             "DUT" : "DUT" #test.schem.DUT.name
         }
 
-        config.updateInstance(self)
+        config.updateInstance(self)# load config file
 
         #self.options = [self.overwrite_maestro,self.overwrite_schematic]
         
@@ -245,6 +245,8 @@ class maestro:
             temp_dict[var.name] = type_dict[var.type]()
             if(hasattr(var,"default")):
                 temp_dict[var.name] = var.default
+            #if(hasattr(var,"options")):
+                
             #type_of_var = 
             #gui_option()
         self.global_dict.update(temp_dict)

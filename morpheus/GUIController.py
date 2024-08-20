@@ -5,7 +5,7 @@ from morpheus.Config import config, config_types
 from morpheus.Maestro import maestro
 from morpheus.Schematic import schematic
 from morpheus.GUIViewer import *
-from morpheus.TabTemplate import TabTemplate
+from morpheus.TabTemplate import TabTemplate,gui_option
 import wx
 import os
 from morpheus import Config
@@ -21,6 +21,10 @@ class GUIController():
         self.libList = None
         self.cellList = None
         self.configs = None
+
+        self.lib = None
+        self.global_dict = dict()
+        self.config = None
 
         self.testPins = []
         self.schems = []
@@ -59,59 +63,96 @@ class GUIController():
         '''Function to handle the bindings of every element on the GUI'''
         #self.GUIframe.lib_sel.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.populateCells)
         #self.GUIframe.btn_reeval.Bind(wx.EVT_BUTTON, self.reevaluate)
-        #self.GUIframe.btn_mktest.Bind(wx.EVT_BUTTON, self.createTest)
+        self.GUIframe.run_btn.Bind(wx.EVT_BUTTON, self.createTest)
+        self.GUIframe.refresh_btn.Bind(wx.EVT_BUTTON, self.refresh_options)
         #self.GUIframe.sel_test.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.loadTest)
         self.GUIframe.config_sel.Bind(wx.EVT_COMBOBOX,self.loadTest)
+        self.GUIframe.lib_sel.Bind(wx.EVT_COMBOBOX,self.callback_lib)
         ### If more buttons are added, their bindings should be added here unless in notebook pane
+    def gui_setup(self):
+
+        type_dict = {
+            "string":str,
+            "int": int
+        }
+        #OBJ.__dict__.update(self.__dict__)
+        temp_dict = dict()
+        #self.global_dict.
+            #         defintion = self.__dict__[key]
+            # if(isinstance(defintion, str)):
+            #     #https://stackoverflow.com/questions/28094590/ignore-str-formatfoo-if-key-doesnt-exist-in-foo
+            #     #s = Template(defintion).safe_substitute(**self.global_dict)
+                # self.__dict__[key] = defintion.format_map(OBJ.global_dict) #update config file dict with globals
+        for var in self.dictionary_variables:
+            print(f"{var.name} is type {var.type}")
+            temp_dict[var.name] = type_dict[var.type]()
+            if(hasattr(var,"default")):
+                temp_dict[var.name] = var.default
+            #if(hasattr(var,"options")):
+                
+            #type_of_var = 
+            #gui_option()
+        self.global_dict.update(temp_dict)
     def loadTest(self,e):
         #create blank maestro view
         
         sel = self.GUIframe.config_sel.GetSelection() #Gets current combo box selection
         
         if sel != -1:  # Makes sure combo box is not empty
+            self.global_dict = dict()
+            self.global_dict.update({"ws":self.ws})
+            #self.global_dict["DUTLIB"] = "morpheus_tests" #TEMP TODO
+            
             selectectConfig = self.configs[self.GUIframe.config_sel.GetSelection()] #get config file from loaded files (or just load file)
-            self.maestro = maestro(self.ws,selectectConfig)
-            self.maestro.gui_setup()
+            self.config = selectectConfig
+            print("CONFIG FILE UPDATED")
+            #self.maestro = maestro(self.ws,selectectConfig)
+            #self.maestro.gui_setup()
+            
+            type_dict = {
+                "string":str,
+                "int": int
+            }
+            #temp_dict = dict()
+            maestro_options_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+            tab_grid = wx.FlexGridSizer(len(selectectConfig.dictionary_variables), 2, 0, 0) #Configure Notebook ta
+            tab_grid.AddGrowableCol(1)
+            for var in selectectConfig.dictionary_variables:
+
+                new_option = gui_option(maestro_options_tab,tab_grid,self.global_dict, var.name,var.default)
+                print(f"{var.name} is type {var.type}")
+                self.global_dict[var.name] = type_dict[var.type]()
+                if(hasattr(var,"default")):
+                    self.global_dict[var.name] = var.default
+                if(hasattr(var,"options")):
+                    #print(eval(var.options))
+                    print(self.global_dict)
+                    try:
+                        new_option.global_dict = self.global_dict
+                        new_option.option_exp = var.options
+                        new_option.options = eval(var.options.format(**self.global_dict))
+                    except:
+                        pass
+                new_option.plan()
+                maestro_options_tab.options.append(new_option)
+            maestro_options_tab.tab_grid = tab_grid
+            maestro_options_tab.build(self.GUIframe.testbench_tabs,"maestro options")
+            self.maestro_options_tab = maestro_options_tab
+                #type_of_var = 
+                #gui_option()
+            #self.global_dict.update(temp_dict)
             #self.openNewTab(self.maestro.global_dict)
             #loadFromObj
-            maestro_options_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
-            maestro_options_tab.loadFromObj(self.maestro.global_dict)
-            maestro_options_tab.build_2(self.GUIframe.testbench_tabs,"maestro options")
+            #maestro_options_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+            ##maestro_options_tab.loadFromObj(self.maestro.global_dict)
+            #maestro_options_tab.build(self.GUIframe.testbench_tabs,"maestro options")
 
-            #self.openNewTab(self.maestro)
-
-            #new_config = config(filepath=selectedTest)
-            #for var in new_config.variables:
-            #self.addVariables(selectectConfig)
-            #CREATE NEW BOXES FOR VARIABLES
-            #lID = self.ws.dd.GetObj(selectedLib)
-            #if not lID.cells is None:
-            #    self.cellList = [cell.name for cell in lID.cells] #Populates a list of available cell views
-            #    self.GUIframe.sel_dut_cell.SetItems(self.cellList) #Updates combo box drop down menu
 
     def openNewTab(self, obj_to_tab):
 
         tab_name = "test tab"
         new_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
         new_tab.build(obj_to_tab,self.GUIframe.testbench_tabs)
-
-        # self.GUIframe.testbench_tabs.AddPage(new_tab, tab_name)
-
-        # tab_grid = wx.FlexGridSizer(len(obj_to_tab.__dict__), 2, 0, 0) #Configure Notebook tab
-        # tab_grid.AddGrowableCol(1)
-        # print("adding props")
-        # for prop in obj_to_tab.__dict__:
-        #     print("prop add")
-        #     #text
-        #     txt = wx.StaticText(new_tab, wx.ID_ANY, prop)
-        #     tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-        #     #dropdown
-        #     sel = wx.ComboBox(new_tab, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        #     tab_grid.Add(sel, 0, wx.ALL | wx.EXPAND, 2)
-
-        # new_tab.SetSizer(tab_grid)
-
-        # new_tab.Layout()
     
     def addVariables(self,config):
         self.GUIframe.testbench_tabs.Show() #Unhide Notebook view
@@ -147,7 +188,10 @@ class GUIController():
         #self.GUIframe.sel_test.AppendItems(files)
         #self.GUIframe.sel_test.AppendItems(tests)
         self.GUIframe.config_sel.AppendItems(files)
-
+    def callback_lib(self,e):
+        selectedLib = self.libList[self.GUIframe.lib_sel.GetSelection()]
+        print(f"lib_sel updated to {selectedLib}")
+        self.lib =selectedLib
     def populateLibraries(self):
 
         '''Function used to populate library drop down'''
@@ -163,7 +207,7 @@ class GUIController():
         '''Function used to poupulate the Cells within a given library'''
 
         sel = self.GUIframe.sel_dut_lib.GetSelection() #Gets current combo box selection
-
+        
         if sel != -1:  # Makes sure combo box is not empty
 
             selectedLib = self.libList[self.GUIframe.sel_dut_lib.GetSelection()] #Gets library from given selection index
@@ -177,71 +221,15 @@ class GUIController():
     def createTest(self,e):
 
         '''Create a new Test and Maestro View'''
-
-        self.maestro = maestro.createMaestroView(self.ws,self.libList[self.GUIframe.sel_dut_lib.GetSelection()],
-                                  self.cellList[self.GUIframe.sel_dut_cell.GetSelection()],
-                                  self.libList[self.GUIframe.sel_lib.GetSelection()])
-
-        test = config(self.GUIframe.sel_test.GetValue(),config_types.TEST) #Load test config YAML
+        print("MAKE TEST")
+        print(self.global_dict)
+        print("DUTLIB is {DUTLIB}".format(**self.global_dict))
         
-        schem = self.maestro.getSchematic(test)  #Create test schematic cooresponding to YAML
-        self.maestro.createConfig(test)
-        self.maestro.createTest(test,schem)            #Create test in Maestro view cooresponding to YAML
+        self.maestro = maestro(self.ws,self.config,self.lib,self.global_dict)
+        self.maestro.createTests() #replace to build
+        #self.maestro.build()
 
     
-        evaluatedPins = schem.evaluatedPins
-        self.GUIframe.testbench_tabs.Show() #Unhide Notebook view
-        self.GUIframe.btn_reeval.Show()
-
-        generate_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
-        self.GUIframe.testbench_tabs.AddPage(generate_tab, self.GUIframe.sel_test.GetValue())
-
-        device_sel_grid = wx.FlexGridSizer(len(schem.evaluatedPins), 2, 0, 0) #Configure Notebook tab
-        device_sel_grid.AddGrowableCol(1)
-        self.GUIframe.Size = (600,800)
-
-        types = [pin.type for pin in schem.config.Terminals]       #Gather pin types for comboboxes 
-
-        self.schems.append(schem)                  #Append new schematic to list
-        self.testPins.append(evaluatedPins)        #Append evaluated pins to list
-
-        for pin in evaluatedPins:
-            pinLabel = wx.StaticText(generate_tab,wx.ID_ANY, pin.label)           #Create Pin Label
-            device_sel_grid.Add(pinLabel, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 0) 
-
-            pinSelect = wx.ComboBox(generate_tab, wx.ID_ANY,name=pin.label, choices=types, style=wx.CB_DROPDOWN | wx.CB_READONLY)#Create Pin type select box
-            if pin.type:
-                pinSelect.SetSelection(pinSelect.FindString(pin.type)) #Set Default combobox value to predetermined pin type, or leave blank
-            device_sel_grid.Add(pinSelect, 0, wx.ALL | wx.EXPAND, 2)
-
-            pinSelect.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.updateTerminal) #Set Combobox binding for updating pins
-
-    
-        generate_tab.sizer_2.Add(device_sel_grid, 0, wx.EXPAND, 0)
-        generate_tab.SetSizer(generate_tab.sizer_2)
-        generate_tab.Layout()
- 
-    def updateTerminal(self,e):
-
-        '''Function used to update Terminal model when Pin selection is changed'''
-
-        ComboBox = e.GetEventObject() #Get which Combobox triggered the event
-        PinLabel = ComboBox.GetName() #Get the name of the combobox representing the pin
-
-        EvalPins = self.testPins[self.GUIframe.testbench_tabs.GetSelection()] #Grab pin list based on tab
-        schem = self.schems[self.GUIframe.testbench_tabs.GetSelection()] #Grab schematic based on tab
-
-        pin_types = {schem.config.Terminals[i].type: schem.config.Terminals[i] 
-                     for i in range(len(schem.config.Terminals))} #Gather pin types from schematic
-
-
-        for pin in EvalPins:
-            if pin.label == PinLabel: #Update the given pin with user selected combobox info
-                pin.type = ComboBox.GetValue()
-                pin_conf = schem.getTerminal(pin_types[pin.type])
-                pin.region = pin_types[pin.type].region
-                pin.update(pin,pin_conf)
-
     #TODO Modify so the bulk of the "re-evaluation" function takes place within the Schematic file
     def reevaluate(self,e):
 
@@ -252,7 +240,9 @@ class GUIController():
         schem.reevaluate(self.testPins[cs])
 
 
-
+    def refresh_options(self,e):
+        for option in self.maestro_options_tab.options:
+            option.update_options()
    # def statusPrint(self, msg):
    #     self.GUIframe.StatusBar.SetStatusText(0,msg);
     

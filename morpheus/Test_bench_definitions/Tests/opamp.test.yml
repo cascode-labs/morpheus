@@ -7,13 +7,16 @@ type: "test"
 schematic: opamp
 
 dictionary_variables:
-- name: DUTCELL
-  type: string #defaults?
-  default: "DUTCELL"
-  options: "self.ws.dd.GetLibList()"
 - name: DUTLIB
   type: string #defaults?
   default: "DUTLIB"
+  options: "[lib.name for lib in self.global_dict['ws'].dd.GetLibList()]"
+  
+- name: DUTCELL
+  type: string #defaults?
+  default: "DUTCELL"
+  options: "[cell.name for cell in self.global_dict['ws'].dd.GetObj('{DUTLIB}').cells]"
+
 
 
 variables:

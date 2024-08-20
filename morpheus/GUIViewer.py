@@ -88,8 +88,10 @@ class GUIViewer(wx.Frame):
         self.run_btn.SetMaxSize((170, 30))
         self.header.Add(self.run_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.FIXED_MINSIZE | wx.LEFT, 10)
 
-        buffer_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "")#buffer
-        self.header.Add(buffer_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        self.refresh_btn = wx.Button(self.panel_main, wx.ID_ANY, "Refresh Options\n")
+        self.refresh_btn.SetMinSize((170, 30))
+        self.refresh_btn.SetMaxSize((170, 30))
+        self.header.Add(self.refresh_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.FIXED_MINSIZE | wx.LEFT, 10)
         #self.panel_main.SetSizer(self.header)
 
         for i in range(rows): #make rows growable

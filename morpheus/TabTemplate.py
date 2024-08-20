@@ -18,12 +18,10 @@ class TabTemplate(wx.ScrolledWindow):
         wx.ScrolledWindow.__init__(self, *args, **kwds)
         self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_MENU))
         self.SetScrollRate(10, 10)
-
+        self.options = list()
         self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
         
         # end wxGlade
-
-
     def loadFromObj(self,obj_to_tab):
         self.options = list()
         counter = 0
@@ -43,84 +41,26 @@ class TabTemplate(wx.ScrolledWindow):
             print("prop add")
             prop_val = obj_options[prop]
             prop_val_type = type(prop_val)
-            new_prop = gui_option(self,self.tab_grid,prop,prop_val)
+            new_prop = gui_option(self,self.tab_grid,obj_options, prop,prop_val)
+            new_prop.plan()
             self.options.append(new_prop)
             self.tab_grid.AddGrowableRow(counter)
             counter = counter +1
+
     #build (do not care about where options came from)
-    def build_2(self,testbench_tabs,tab_name):
+    def build(self,testbench_tabs,tab_name):
         testbench_tabs.AddPage(self, tab_name)
         for option in self.options:
             option.build()
         self.SetSizer(self.tab_grid)
         self.Layout()
-    #BUILD FROM OBJ
-    def build(self, obj_to_tab, testbench_tabs):
-        tab_name = "test tab"
-        #new_tab = TabTemplate(testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
-        testbench_tabs.AddPage(self, tab_name)
-
-        
-        counter = 0
-        self.options = list()
-
-        obj_options_names = list()
-        obj_options = dict()
-
-        if type(obj_to_tab) is list:
-            obj_options = {f"list{i}": obj_to_tab[i] for i in range(0, len(obj_to_tab), 1)} #it is list
-        elif(type(obj_to_tab) is not dict):
-            obj_options = obj_to_tab.__dict__ #it is an object not dictionary or list
-        else:
-            obj_options = obj_to_tab #it is dictionary
-
-        tab_grid = wx.FlexGridSizer(len(obj_options), 2, 0, 0) #Configure Notebook ta
-        tab_grid.AddGrowableCol(1)
-        print("adding props")
-
-
-        for prop in obj_options:
-            print("prop add")
-
-            prop_val = obj_options[prop]
-            prop_val_type = type(prop_val)
-
-            new_prop = gui_option(self,tab_grid,prop,prop_val)
-            new_prop.build()
-            self.options.append(new_prop)
-            tab_grid.AddGrowableRow(counter)
-            counter = counter +1
-            #text
-            # txt = wx.StaticText(self, wx.ID_ANY, prop)
-            # tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-            # prop_val = obj_to_tab.__dict__[prop]
-            # prop_val_type = type(prop_val)
-            # #https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
-            # if prop_val_type is str:
-            #     OPTION_input = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-            # elif prop_val_type is bool:
-            #     OPTION_input = wx.CheckBox(self,wx.ID_ANY,"yes", style=0)
-            # elif prop_val_type is dict:
-            #     OPTION_input = wx.CollapsiblePane(self,wx.ID_ANY,label="DICT")
-            #     for var in prop_val:
-
-            # else:
-            #     print(prop_val_type)
-            #     OPTION_input = wx.StaticText(self, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
-            # tab_grid.Add(OPTION_input, 0, wx.ALL | wx.EXPAND, 2)
-            #dropdown
-            
-        #tab_grid.Fit(new_tab)
-        self.SetSizer(tab_grid)
-        #tab_grid.Fit(new_tab)
-        #new_tab.sizer_2.Add(tab_grid, 0, wx.EXPAND, 0)
-        #new_tab.SetSizer(generate_tab.sizer_2)
-        self.Layout()
+   
 
 # end of class TabTemplate
 class gui_option():
-    def __init__(self,parent,grid,dict_variable, value):
+    def __init__(self,parent,grid,dictionary,dict_variable, value):
         self.dict_var = dict_variable
+        self.dictionary = dictionary
         self.grid = grid
         self.parent = parent
         self.value = value
@@ -134,76 +74,14 @@ class gui_option():
         prop_val_type = type(prop_val)
 
         self.txt = wx.StaticText(parent, wx.ID_ANY, prop)
-        #tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
 #https://stackoverflow.com/questions/1952464/python-how-to-determine-if-an-object-is-iterable
 
         if prop_val_type is str:
-            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-
-        elif prop_val_type is bool:
-            self.option = wx.CheckBox(parent,wx.ID_ANY,"yes", style=0)
-        elif prop_val_type is dict or prop_val_type is list:
-
-            collpane = wx.CollapsiblePane(parent, wx.ID_ANY, "Details:");
-            self.option = collpane
-            prop_val = ["test", "hello", "world"]
-            win = collpane.GetPane();
-            paneSz = wx.BoxSizer(wx.VERTICAL);
-            new_tab_grid = wx.FlexGridSizer(len(prop_val), 2, 0, 0) #Configure Notebook ta
-            new_grid = new_tab_grid;
-            new_parent = win
-            counter = 0
-            for option in prop_val:
-                prop2 = f"{prop}[{counter}]"
-                counter= counter+1
-                prop_val = "tehllo work"
-                new_prop = gui_option(new_parent,new_grid,prop2,prop_val)
-                new_prop.build()
-
-            win.SetSizer(new_grid);
-            paneSz.SetSizeHints(win);
-        else:
-            print(prop_val_type)
-            self.option = wx.StaticText(parent, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
-
-    def on_text_change(self, event):
-        current_value = self.cb.GetValue()
-        if current_value != self.cb_value and current_value not in self.combo_contents:
-            # Value has been edited
-            index = self.combo_contents.index(self.cb_value)
-            self.combo_contents.pop(index)
-            self.combo_contents.insert(index, current_value)
-            self.cb.SetItems(self.combo_contents)
-            self.cb.SetValue(current_value)
-            self.cb_value = current_value
-
-    def comboUpdate(self,e):
-        pass
-    def build_test(self):
-        tab_grid = self.grid
-        tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-        tab_grid.Add(self.option, 0, wx.GROW|wx.ALL, 2)
-    def build(self):
-        parent = self.parent
-        tab_grid = self.grid
-
-        prop_val = self.value
-        prop = self.dict_var
-        prop_val_type = type(prop_val)
-
-        self.txt = wx.StaticText(parent, wx.ID_ANY, prop)
-        tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-#https://stackoverflow.com/questions/1952464/python-how-to-determine-if-an-object-is-iterable
-
-        if prop_val_type is str:
-            #check for options?
-
-            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN )#| wx.CB_READONLY
-            #wx.EVT_TEXT
-            #self.option = wx.TextCtr(parent, wx.ID_ANY, style=wx.CB_DROPDOWN | wx.CB_READONLY)
-            
-            #self.option.Bind(wx.EVT_TEXT,self.on_text_change)
+            if(not hasattr(self,"options")):
+                self.options = list()
+            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=self.options, style=wx.CB_DROPDOWN )#| wx.CB_READONLY
             self.option.SetValue(prop_val)
+            self.option.Bind(wx.EVT_TEXT,self.callback)
             print(f"{prop} is set to {prop_val}")
 
         elif prop_val_type is bool:
@@ -225,26 +103,49 @@ class gui_option():
                 prop_val = "tehllo work"
                 new_prop = gui_option(new_parent,new_grid,prop2,prop_val)
                 new_prop.build()
-            #paneSz.Add(wx.StaticText(win, wx.ID_ANY, "test!"), 1, wx.GROW|wx.ALL, 2);
-            
+
             win.SetSizer(new_grid);
             paneSz.SetSizeHints(win);
-            #tab_grid.Add(collpane, 0, wx.GROW|wx.ALL, 5);
-            #self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-            # self.option = wx.CollapsiblePane(parent,wx.ID_ANY,label="DICT/LIST")
-            # new_grid = wx.FlexGridSizer(len(prop_val), 2, 0, 0) #Configure Notebook ta
-            # new_parent = self.option.GetPane()
-            # for option in prop_val:
-            #     if(type(option) is str):
-            #         print("value add" + option)
-            #     prop = "test"
-            #     prop_val = option
-            #     new_prop = gui_option(new_parent,new_grid,prop,prop_val)
         else:
             print(prop_val_type)
             self.option = wx.StaticText(parent, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
+    def callback(self,e):
+        print("callbackS");
+        print(f"changng valeu {self.dict_var}");
+        self.dictionary[self.dict_var] =self.option.GetValue()
+        print(self.option.GetValue())
+        print(self.dictionary)
+        try:
 
-        
+            print(self.option_exp.format(**self.global_dict))
+            self.options = eval(self.option_exp.format(**self.global_dict))
+            #self.option.Set(self.options) 
+            print(self.options)
+            print("successful");
+        except:
+            print("failed to get values")
+            pass
+    def update_options(self):
+        if(self.options == eval(self.option_exp.format(**self.global_dict))):
+            print("no update")
+        else:
+            self.options = eval(self.option_exp.format(**self.global_dict))
+            self.option.Set(self.options) 
+    def on_text_change(self, event):
+        current_value = self.cb.GetValue()
+        if current_value != self.cb_value and current_value not in self.combo_contents:
+            # Value has been edited
+            index = self.combo_contents.index(self.cb_value)
+            self.combo_contents.pop(index)
+            self.combo_contents.insert(index, current_value)
+            self.cb.SetItems(self.combo_contents)
+            self.cb.SetValue(current_value)
+            self.cb_value = current_value
 
+    def comboUpdate(self,e):
+        pass
+    def build(self):
+        tab_grid = self.grid
+        tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
         tab_grid.Add(self.option, 0, wx.GROW|wx.ALL, 2)
-    
+   
