@@ -8,7 +8,7 @@ from morpheus.Exceptions.SelectionBox import SelectionBoxException
 from morpheus import Config
 from string import Template
 from morpheus.Terminal import Terminal
-from morpheus.Schematic import schematic
+
 
 class FailsafeDict(dict):
     def __getitem__(self, item):
@@ -22,31 +22,13 @@ class FailsafeDict(dict):
 
 class instance:
     def __init__(self, ws, config,global_dict = dict()) -> None:
-        # if configfile is None:
-        #     #Because it is not configured no evalutation is possible
-        #     self.terminal_types = None
-        #     self.net_types = None
-        #     self.inst_types = None
-
-        #     self.lib = lib
-        #     self.cell = cell
-        #     self.location = location
-        # else:
-        #     config = Config.config(configfile,Config.config_types.TERMINAL)
-        
             self.location = None
             self.term = None
 
             self.global_dict = FailsafeDict(global_dict)
 
             self.loadConfig(config)
-            # for key in config.__dict__: #GO RECURSIVELY EVENTUALLY
-            #     defintion = config.__dict__[key]
-            #     if(isinstance(defintion, str)):
-            #         config.__dict__[key] = defintion.format(**self.global_dict) #update config file dict with globals
-            # self.__dict__.update(config.__dict__)
 
-            #self.inst = cadence_inst
             self.x_offset = 0;
             self.y_offset = 0;
             self.ws = ws #skillbridge
@@ -157,8 +139,6 @@ class instance:
         else:
             pass
 
-
-
     def get_matches(list_of_objs, parameter, pattern):
         #evalutate cellview or symbol view
         #Either get nets/insts inside cellview or use symbol pins
@@ -186,8 +166,8 @@ class instance:
         oldx = self.x
         oldy = self.y
         self.cv = cv
-        self.x = schematic.ceilByInt(xoffset + self.x + self.width/2 - self.x_offset,gridSize)
-        self.y = schematic.ceilByInt(yoffset + self.y + self.height/2 - self.y_offset,gridSize)
+        self.x = instance.ceilByInt(xoffset + self.x + self.width/2 - self.x_offset,gridSize)
+        self.y = instance.ceilByInt(yoffset + self.y + self.height/2 - self.y_offset,gridSize)
         #TODO add special case for no connect
         if(self.term == "NOCONNECT"):
             name = self.label + "_NOCONN"
@@ -198,8 +178,8 @@ class instance:
             position = [self.x,self.y]
             rotation = "R0" #add rotate functionality
             prop = list() 
-            self.x = schematic.ceilByInt(xoffset + oldx - self.x_offset,gridSize)
-            self.y = schematic.ceilByInt(yoffset + oldy - self.y_offset ,gridSize)
+            self.x = instance.ceilByInt(xoffset + oldx - self.x_offset,gridSize)
+            self.y = instance.ceilByInt(yoffset + oldy - self.y_offset ,gridSize)
             position = [self.x,self.y]
             new_inst = self.ws.db.CreateParamInst(cv, self.symbol, self.name, position, rotation,1,prop) #create instance with parameters
         else:
@@ -247,7 +227,8 @@ class instance:
         if(hasattr(self,"terminals")):
             for term in self.terminals:
                 self.createWireForFloatingInstPin(term)
-
+    def ceilByInt(num, base):
+        return base * math.ceil(num/base)
     def createWireForFloatingInstPin(self,term): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(term.cadence_term.pins[0].fig.bBox, self.inst.transform)
 

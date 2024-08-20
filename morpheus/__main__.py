@@ -206,6 +206,7 @@ def main(morph_args: list | None = None):
                 sleep(1)
                 attempts += 1
         #if failed try to kill server/virtuoso
+        
     try:
         UnixCommands(ws,args)
 

@@ -6,91 +6,62 @@ import logging
 from morpheus.Exceptions.SelectionBox import SelectionBoxException
 
 from morpheus.Terminal import Terminal
-
+from morpheus.Instance import instance
 logger = logging.getLogger(__name__)
 
-class DUT_pin:
-    def __init__(self,pin) -> None:
-        self.eval  = False
-        self.pin  = pin
-        self.label = pin
-        self.type = ""
-class plan_region:
-    def __init__(self,x,y,height,width) -> None:
-            self.x  = x
-            self.y  = y
-            self.height = height
-            self.width = width
+class box:
+    def __init__(self,w,h) -> None:
+        self.w =w
+        self.h =h
+        pass
+class regionClass:
+    def __init__(self,instances=list()) -> None:
+        self.instances =instances
+        pass
 class schematic:
 
-    def __init__(self,ws,lib,DUT,config, tconfig) -> None:
-        self.DUT = DUT
-        self.ws = ws
-        self.tconfig = tconfig
-        self.config = config
-        self.lib = lib
-        self.terminals = dict()
-        self.instances = dict()
-        self.gridSize = self.ws.sch.GetEnv("schSnapSpacing") #used for snapping everything to grid
+    def __init__(self,ws,config,lib,cell, global_dict = dict()) -> None:
 
-        self.evaluatedPins = list()
-        if(hasattr(self.config,"cell")):
-            self.cell = self.config.cell
-        else:
-            self.cell = self.DUT.cell_name + "_AUTO_TB"
-        if(hasattr(self.config,"Build")):
-            self.config.Build = list()
-        #set schematic view name
-        if(hasattr(self.config,"name")):
-            self.view = self.config.name
-        else:
-            self.view = "schematic_" + self.DUT.cell_name 
+        self.lib =lib
+        self.ws = ws
+        self.config = config
+        
+        #DEFAULTS
+        self.cell = "Morpheus_Testbench"
+        self.view = "schematic"
+        self.region_padding = 1
+        self.subregion_padding = 0.2
+        self.terminals = dict()
+        self.instances = dict()#TODO remame
+        self.gridSize = self.ws.sch.GetEnv("schSnapSpacing") #used for snapping everything to grid
+        
+        #load config view
+        self.global_dict = global_dict
+        self.updateInstance(config)
+        
         #check if view already exists
         cvid = self.ws.dd.GetObj(self.lib,self.cell,self.view) #delete
+
         self.evaluate()#always evaluate 
-        #No reason not to?
         if(cvid is None):
             #just build?
             pass
         else:
             self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "a") #appendmode. DONT DELETE WORK
-            self.findDUT()#potential break if no DUT TODO fix
+            #self.findDUT()#potential break if no DUT TODO fix
             ws.db.Close(self.cv)
             #check if open and give warning if so
 
-        #cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
-        #if(cv is None and cvid is not None): #TODO CREATION EXCEPTIONS
-        #    logger.error("Cannot build schematic because schematic not found. Check if open elsewhere")
-        #    print("Error: Schematic not found. Check if open elsewhere")
-        #    return
-
-#load schematic from file or use import if doesnt exist
-    #def load(self,config):
-        #read config file
-        
-        #Import instead
-
-
-#save schematic configuration into yml file
-    #def save(self):
-    #def find_DUT(self, pins):
-
-
     def reevaluate(self, pins):
         self.evaluatedPins = pins
-
         cvid = self.ws.dd.GetObj(self.lib,self.cell,self.view) #delete
-        
         #self.maestro.createEquations()
-
         self.ws.dd.DeleteObj(cvid) #delete
-        
         self.plan()
         self.build()
 
     def getInst(self,inst): #TODO use dict to load terminals only once
         instance = self.instances.get(inst.name)
- 
         if  instance is None:
             logger.info("Skill loading " + inst.name)
             print("Skill loading " + inst.name)
@@ -100,7 +71,6 @@ class schematic:
 
     def getTerminal(self,term_type): #TODO use dict to load terminals only once
         terminal = self.terminals.get(term_type.term)
- 
         if terminal is None:
             terminal = config(term_type.term,config_types.TERMINAL)
             self.terminals.update({term_type.term:terminal})
@@ -110,209 +80,162 @@ class schematic:
     
 
     def evaluate(self):
+        if(hasattr(self.config,"variables")):
+            pass
         #match pin names to terminals defined in the PLAN section of schematic config
         #for(term in self.config.Build):
         logger.info("Starting evaulation for DUT pins")
+
+        #https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
+        self.instances[:] = [instance(self.ws,inst,self.global_dict) for inst in self.instances]
+        for inst in self.instances:
+            inst.evaluate()
+        print("Evaluated all Instances")
+
+
+    def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN TODO just pass the gridsize?
+        planned_insts = list()
+        #move all terminals to schematic
+        for inst in self.instances:
+            planned_insts.append(inst)
+            planned_insts.extend(inst.terminals) #add all instances to schematic
         
-        for pin in self.DUT.terminals: # go through all terminals on DUT
-            inst = DUT_pin(pin.name) #contains default values
-            term = Terminal(pin)
-            for pin_type in self.config.Terminals:
-                if(re.search(pin_type.pattern,pin.name) != None): #use RegEx to find if the pin matches the pin_type
-                    
-                    term.update(pin_type)#,term_type)
-                    #CHECK IF SHOULD BREAK (one pin multiple terminals?)
-                    break;
-            self.evaluatedPins.append(term)
-
-
-        if(hasattr(self.config,"Modules")): #config has modules
-            logger.info("Starting evaulation for modules")  
-            for module in self.config.Modules:
-                pinslist= list()
-                pinnum = 0
-                for subpin in module.pins:
-                    DUTpin = None
-                    for pin in self.DUT.terminals:  #Use pattern to find DUTpin (TODO: upgrade to nets instead)
-                        if(re.search(subpin.pattern,pin.name) != None):
-                            DUTpin = pin
-                            break
-                           
-                    
-                        
-                    if(not DUTpin):
-                        logger.warning("Could not find pin ", pinnum ," for ", module.name)
-                        print("Could not find pin ", pinnum ," for ", module.name)
-                        break
-                    pinslist.append(DUTpin)
-                    pinnum+=1
-                else: #only runs if successfully ran (will not run on break)
-                    term = Terminal(module) #create new terminal
-                    term.update(module,pinslist=pinslist)
-                    self.evaluatedPins.append(term)
-
-    def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN
+        non_region_removed = [i for i in planned_insts if hasattr(i,"region")] #only terminals that have regions
+        #still needed for NOCONNECT
+        
+        max_region = 9
         self.regions = list()
+        regions_temp = list()
+        region_sorted_list = list()
+        #sort by Region
+        for region_num in range(max_region):
+            region_sorted = list(filter(lambda x: x.region == region_num, non_region_removed))
+            if len(region_sorted) > 0:
+                region_sorted_list.append(region_sorted)
+                new_region = regionClass(region_sorted) #blank for now
+                #s#elf.regions.append(new_region)
+                regions_temp.append(new_region)
+        #sort by type
+        new_regions = list()
+        for region in regions_temp: #REGION
+            types = schematic.unique(region.instances,"type")
+            
+            new_region = regionClass()
+            new_regions.append(new_region)
+            #type_region = regionClass(types)
+            subregions = list()
+            for sch_type in types:#SUBREGION
+                types_sorted = list(filter(lambda x: x.type == sch_type.type, region.instances))
 
-        max_region = 4
-        if(hasattr(self.config,"Build")): #DEFAULTS
-            self.Build = self.config.Build
-        else:
-            self.Build = list() #reset build list (look at (and append) Config Build?)
-
-        
-        #create Dict for all pin types in schematic
-        pin_types = {self.config.Terminals[i].type: self.config.Terminals[i] for i in range(len(self.config.Terminals))} 
-        #only plan pins that have been evaluated
-        valid_pins = [pin for pin in self.evaluatedPins if pin.eval]
-        for pin in valid_pins:
-            pin_type = pin_types.get(pin.type)
-            self.Build.append(pin)
-        
-        #go back and calculate sizing per regions
-        region_removed = [i for i in self.Build if hasattr(i,"region")] #only terminals that have regions
-        box = self.DUT.b_box
-        region_max_height = abs((box[1][0]) - (box[1][1]))+3#self.DUT
-        region_max_width = abs((box[0][0]) - (box[1][0]))
-        DUT_Pin_Boxs = [i.b_box for i in self.DUT.shapes if i.layer_name == "pin"]
-        xMin=0
-        xMax=0
-        yMin=0
-        yMax=0
-        for box in DUT_Pin_Boxs:
-            xMin = min(box[1][0],xMin)
-            xMax = max(box[0][0],xMax)
-            yMin = min(box[1][1],xMin)
-            yMax = max(box[0][1],yMax)
-
-        region_max_height = yMax-yMin
-        region_max_width = xMax-xMin
-
-        gridSize = self.ws.sch.GetEnv("schSnapSpacing")
-        #TODO TEMP VARS
-        region_x =0
-        region_y = 0
-        for i in range(max_region):
-            region_sorted = list(filter(lambda x: x.region == i, region_removed))
-            MAX_OBJ=len(region_sorted)
-            x_offset = 0
-            y_offset = 0
-            box_w = 0
-            box_h = 0
-            avail_w = 0
-            avail_h = 0
-            avail_x = 0
-            avail_y = 0
-            ratio = 8
-            x = 0
-            y = 0
-            #calculate spacing for regions
-            while(len(region_sorted) > 0):
-                #if(avail_h > .1):
+                for inst in types_sorted: #INST
+                    inst.plan()
+                [typeregion_w,typeregion_h] = self.layout(types_sorted)
                 
-                if(box_w <= box_h*ratio):
-                    region_sorted = sorted(region_sorted, key=lambda x: x.height, reverse=False)
-                   
-                else:
-                    region_sorted = sorted(region_sorted, key=lambda x: x.width, reverse=False)
-                    x = 0
-                    y += schematic.ceilByInt(term.height,gridSize) #TODO
-                term = region_sorted.pop()
+                subregion = regionClass(types_sorted[:])
+                subregion.width = typeregion_w  #+ self.subregion_padding*2
+                subregion.height = typeregion_h #+ self.subregion_padding*2
+                subregions.append(copy.copy(subregion))
+            new_region.instances = subregions[:]
+            self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
+            [region_w,region_h] = self.layout(new_region.instances)
+            #new_region = regionClass(types_sorted)
+            #new_region.instances.append(type_region)
+            new_region.width =region_w + self.region_padding
+            new_region.height = region_h + self.region_padding
+            
+            self.regions.append(copy.copy(new_region))
+            #new_region.reset() 
+        [total_width,total_height] = self.layout(self.regions)
 
-                box_w = schematic.ceilByInt(max(x,box_w),gridSize)
-                box_h = schematic.ceilByInt(max(y,box_h),gridSize)
-                #x = box_w #TODO
-                #avail_h = 
-               
-                term.plan([x,y])
-
-                x += schematic.ceilByInt(term.width,gridSize)
-            region = plan_region(region_x,region_y, box_h,box_w)
-            #region_x += box_w
-
-            self.regions.append(region) #add height/width of region
-
-            region_max_height = max(region_max_height,box_h)
-            region_max_width = max(region_max_width,box_w)
-        count = 0
-
-        region_max_height = region_max_height + 2
-        region_max_width = region_max_width +2 #TODO fix this
-
-        #TODO FIX REGIONS TO USE INFINITE REGIONS IN FORMAT (3x3,4x4,5x5,etc.)
-        #only move around planned terminals TODO change back to region as all regions terminals should be planned
-        #comment region_removed = [i for i in self.Build if hasattr(i,"planned")]
-        rows = round(math.sqrt(max_region))
-        height = region_max_height
-        width = region_max_width
-        #add region sizing
-        for region in range(max_region):
-            region_sorted = list(filter(lambda x: x.region == region, region_removed))
-            x = schematic.ceilByInt((region%rows)*width,gridSize) #TODO
-            y = schematic.ceilByInt(math.floor(region/rows)*height,gridSize) #TODO
-
-            for term in region_sorted:
-                
-                term.position[0] = term.position[0] + x #TODO
-                term.position[1] = term.position[1] - y #+ region*3
-                count +=1
+        #plan
 
 
-        #TODO add bounding box type for building
+    #https://stackoverflow.com/questions/26043482/how-to-get-unique-values-from-a-python-list-of-objects modified slightly
+    def unique(list1,parameter):
+        # intilize a null list
+        unique_list = []
+        parameter_list = []
+        # traverse for all elements
+        for x in list1:
+            param_val =getattr(x,parameter)
+            # check if exists in unique_list or not
+            if param_val not in parameter_list:
+                parameter_list.append(param_val)
+                unique_list.append(x)
 
+        return unique_list
    
 
-    
+    def layout(self,boxes):#TODO ADD padding
+        layout_w = 0
+        layout_h = 0
+        ratio = 5
+        x = 0
+        y = 0            
+        self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
+        regionbox = self.ws.sch.CreateNoteShape( self.cv, "rectangle", "dashed", [ [0, 0],[1,1]] )
+        while(len(boxes) > 0):
+            if(layout_w <= layout_h*ratio):
+                boxes = sorted(boxes, key=lambda x: x.height, reverse=False) #sort by heights
+                box = boxes.pop()
+                box.x =x #add inst/region x and y
+                layout_w = schematic.ceilByInt(max(x+box.width, layout_w),self.gridSize)
+                x += schematic.ceilByInt(box.width,self.gridSize)
+            else:
+                boxes = sorted(boxes, key=lambda x: x.width, reverse=False) # sort by widths
+                box = boxes.pop()
+                box.x =0 #add inst/region x and y
+                x = 0
+                x += schematic.ceilByInt(box.width,self.gridSize)
+                y += schematic.ceilByInt(layout_h,self.gridSize) #TODO
+                #layout_h =box.height + layout_h
+            box.y = y
+
+            self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [ [box.x, box.y],[box.x+box.width,box.y+box.height]] )
+
+            
+            layout_h = schematic.ceilByInt(max(box.height+y,layout_h),self.gridSize)
+            regionbox.b_box= [[0,0],[layout_w,layout_h]]
+            regionbox.b_box= [[0,0],[layout_w,layout_h]]
+
+        return [layout_w,layout_h]
+        
+    def ceilByInt(num, base):
+        return base * math.ceil(num/base)
     #place all terminals in schematic
     def build(self):
-        ws= self.ws
-        terminals = self.terminals
         logger.info("Start building schematic")
         print("Building!")
-        #create cell view for schematic
-        #self.view = "schematic_" + self.config.name #TODO standarize this to set in init
-        cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
-        if(cv is None): #TODO CREATION EXCEPTIONS
+        
+        self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
+
+        if(self.cv is None): #TODO CREATION EXCEPTIONS
             logger.error("Cannot build schematic because schematic not found. Check if open elsewhere")
             print("Error: Schematic not found. Check if open elsewhere")
             return
-        self.cv = cv #NOT unnecissary anymore
         
-        box = self.DUT.b_box
-        [x,y] = schematic.calculateDUTSize(self.DUT)
-        [x,y] = [x/2 -2, y/2]
-        [x,y] = [schematic.ceilByInt(x,self.gridSize),schematic.ceilByInt(y,self.gridSize)]
-        dut_inst = ws.sch.CreateInst( self.cv, self.DUT, "DUT", [x,y], "R0") #place DUT TODO add code to check bounding box
-        self.DUTinst = dut_inst
-        self.DUTname = dut_inst.name
-        #RUN THROGUTH ALL TERMINALS
-        for terminal in self.Build: #TODO add check not to load the same master twice
-            pin = [p for p in self.DUT.terminals if hasattr(terminal,"label") and p.name == terminal.label]
-            if(len(pin)>0):
-                dir = self.createWireForFloatingInstPin(dut_inst, pin[0] ,terminal.net)
-                #self.ws['CCSCreateWireForFloatingInstPin'](cv,dut_inst, pin[0] ,terminal.label) #TODO make work with no pin heads (also make part of python rather than skill)
-            terminal.build(ws,self.cv,dir)
         for region in self.regions:
-            self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [[region.x,region.y], [region.x + region.width, region.y + region.height]] )
-        if(hasattr(self.tconfig, 'scriptpath')): #If custom script is provided, run the script
-            ws['load'](self.tconfig.scriptpath)
-            ws[self.tconfig.script](self.cv)
+            region_x1 = region.x + region.width;
+            region_x2 = region.x;
+            region_y1 = region.y + region.height;
+            region_y2 = region.y;
+            self.ws.sch.CreateNoteShape( self.cv, "rectangle", "dashed", [[region_x1,region_y1],[region_x2, region_y2]] )
+            for subregion in region.instances:
+                x= subregion.x + region.x #+ self.region_padding
+                y= subregion.y + region.y #+  self.region_padding
+                box_x1 = x #+ subregion.width/2
+                box_x2 = x+ subregion.width
+                box_y1 = y #+ subregion.height/2
+                box_y2 = y+ subregion.height
+                self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [ [box_x2, box_y2],[box_x1,box_y1]] )
+                for inst in subregion.instances:
+                   inst.build(self.cv,0,x,y,self.gridSize)
 
-
-        ws.db.Check(self.cv) 
-        ws.db.Save(self.cv)
-        ws.db.Close(self.cv)
+        self.ws.db.Check(self.cv) 
+        self.ws.db.Save(self.cv)
+        self.ws.db.Close(self.cv)
         logger.info("Finished building schematic")
     #end build
-
-    def findDUT(self):
-        if(self.cv.instances is not None):
-            for inst in self.cv.instances:
-                if inst.cell_name == self.DUT.cell_name:
-                    self.DUTinst = inst #internal
-                    self.DUTname = inst.name
-                    return inst
-        return None #none found        
 
     def createWireStubs(self):
         dut_inst = self.findDUT()
@@ -327,21 +250,6 @@ class schematic:
             else:
                 label = terminal.name
             self.createWireForFloatingInstPin(dut_inst, terminal ,label)
-    def calculateDUTSize(DUT):
-        DUT_Pin_Boxs = [i.b_box for i in DUT.shapes if i.layer_name == "pin"]
-        xMin=0
-        xMax=0
-        yMin=0
-        yMax=0
-        for box in DUT_Pin_Boxs:
-            xMin = min(box[1][0],xMin)
-            xMax = max(box[0][0],xMax)
-            yMin = min(box[1][1],xMin)
-            yMax = max(box[0][1],yMax)
-
-        max_height = yMax-yMin
-        max_width = xMax-xMin
-        return [max_width,max_height]
     
     def ceilByInt(num, base):
         return base * math.ceil(num/base)
@@ -366,7 +274,6 @@ class schematic:
         except IndexError:
             raise SelectionBoxException #No selection box in symbol
         
-
         left_E = ibox[0][0]
         right_E=ibox[1][0]
         top_E=ibox[1][1]

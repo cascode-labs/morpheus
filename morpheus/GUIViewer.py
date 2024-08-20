@@ -10,6 +10,7 @@ import wx
 # begin wxGlade: extracode
 # end wxGlade
 
+from morpheus.TabTemplate import TabTemplate
 
 class GUIViewer(wx.Frame):
     def __init__(self, *args, **kwds):
@@ -35,79 +36,85 @@ class GUIViewer(wx.Frame):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
         self.panel_main = wx.Panel(self, wx.ID_ANY, style=wx.BORDER_SIMPLE)
-        
-        rows = 3
-        #1) CONFIG FILE
-        #2) Testbench File
-        #3) RUN BUTTON
-        self.header = wx.FlexGridSizer(4, 1, 0, 0)
-        grid_sizer_1 = wx.FlexGridSizer(4, 1, 0, 0)
-
-        grid_sizer_2 = wx.FlexGridSizer(3, 2, 0, 0)
-        grid_sizer_1.Add(grid_sizer_2, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
 
+        self.build_header()
+        self.build_body()
+        self.panel_main.SetSizer(self.body)
 
-#GET CONFIG FILES SELECTION
-        configs_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Config File")
-        grid_sizer_2.Add(configs_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-        #self.configs_sel = wx.ComboBox(self.panel_main, wx.ID_ANY, style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        #configs_sel.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.populateCells)
-
-        sellib_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Testbench Library")
-        grid_sizer_2.Add(sellib_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-
-        self.sel_lib = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        grid_sizer_2.Add(self.sel_lib, 0, wx.ALL | wx.EXPAND, 2)
-
-        dutlib_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select DUT Library")
-        grid_sizer_2.Add(dutlib_txt, 0, wx.ALIGN_CENTER, 0)
-
-        self.sel_dut_lib = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        grid_sizer_2.Add(self.sel_dut_lib, 0, wx.ALL | wx.EXPAND, 2)
-
-        dutcell_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select DUT Cell")
-        grid_sizer_2.Add(dutcell_txt, 0, wx.ALIGN_CENTER, 0)
-
-        self.sel_dut_cell = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        grid_sizer_2.Add(self.sel_dut_cell, 0, wx.ALL | wx.EXPAND, 2)
-
-        self.btn_reeval = wx.Button(self.panel_main, wx.ID_ANY, "Re-evaluate")
-        self.btn_reeval.SetMinSize((170, 30))
-        self.btn_reeval.SetMaxSize((170, 30))
-        grid_sizer_1.Add(self.btn_reeval, 0, wx.ALIGN_CENTER_VERTICAL | wx.FIXED_MINSIZE | wx.LEFT, 10)
-        self.btn_reeval.Hide()
-
-        grid_sizer_3 = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_sizer_1.Add(grid_sizer_3, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-
-        self.btn_mktest = wx.Button(self.panel_main, wx.ID_ANY, "Make Test\n")
-        self.btn_mktest.SetMinSize((170, 30))
-        grid_sizer_3.Add(self.btn_mktest, 0, 0, 10)
-
-        self.sel_test = wx.ComboBox(self.panel_main, wx.ID_ANY, style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        self.sel_test.SetSelection(0)
-        grid_sizer_3.Add(self.sel_test, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL | wx.EXPAND, 2)
-
-        self.testbench_tabs = wx.Notebook(self.panel_main, wx.ID_ANY)
-        self.testbench_tabs.Hide()
-        grid_sizer_1.Add(self.testbench_tabs, 1, wx.EXPAND, 0)
-
-        grid_sizer_3.AddGrowableRow(0)
-        grid_sizer_3.AddGrowableCol(1)
-
-        grid_sizer_2.AddGrowableRow(0)
-        grid_sizer_2.AddGrowableRow(1)
-        grid_sizer_2.AddGrowableRow(2)
-        grid_sizer_2.AddGrowableCol(1)
-
-        grid_sizer_1.AddGrowableRow(3)
-        grid_sizer_1.AddGrowableCol(0)
-        self.panel_main.SetSizer(grid_sizer_1)
-
-        grid_sizer_1.Fit(self)
+        self.body.Fit(self)
         self.Layout()
         self.Centre()
-        # end wxGlade
 
+    def build_body(self):
+        rows = 3
+        cols = 1
+        self.body = wx.FlexGridSizer(rows, cols, 0, 0)
+        self.body.Add(self.header, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 0)
+
+        self.testbench_tabs = wx.Notebook(self.panel_main, wx.ID_ANY)
+        self.body.Add(self.testbench_tabs, 1, wx.EXPAND, 0)
+        #self.body.AddGrowableRow(3)
+        self.body.AddGrowableRow(2)
+        self.body.AddGrowableRow(1)
+        self.body.AddGrowableCol(0)
+        #self.optionsTabMaestro()
+
+        #self.body.AddGrowableRow(0)
+        #self.body.AddGrowableRow(1)
+
+    def build_header(self):
+        rows = 3
+        cols = 2
+        self.header = wx.FlexGridSizer(rows, cols, 0, 0)
+    # ROW 1) CONFIG FILE SELECTION
+        #text
+        configs_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Config File")
+        self.header.Add(configs_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        #dropdown
+        self.config_sel = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        self.header.Add(self.config_sel, 0, wx.ALL | wx.EXPAND, 2)
+
+    # ROW 2) Testbench LIBRARY SELECTION
+        #text
+        lib_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "Select Testbench Library")
+        self.header.Add(lib_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        #dropdown
+        self.lib_sel = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        self.header.Add(self.lib_sel, 0, wx.ALL | wx.EXPAND, 2)
+    # ROW 3) RUN BUTTON
+        self.run_btn = wx.Button(self.panel_main, wx.ID_ANY, "Make Test\n")
+        self.run_btn.SetMinSize((170, 30))
+        self.run_btn.SetMaxSize((170, 30))
+        self.header.Add(self.run_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.FIXED_MINSIZE | wx.LEFT, 10)
+
+        buffer_txt = wx.StaticText(self.panel_main, wx.ID_ANY, "")#buffer
+        self.header.Add(buffer_txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        #self.panel_main.SetSizer(self.header)
+
+        for i in range(rows): #make rows growable
+            self.header.AddGrowableRow(i)
 # end of class GUI_Viewer
+    def optionsTabMaestro(self):
+        tab_name = "Maestro Options"
+        new_tab = TabTemplate(self.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+        self.testbench_tabs.AddPage(new_tab, tab_name)
+        rows = 2
+        tab_grid = wx.FlexGridSizer(rows, 2, 0, 0) #Configure Notebook tab
+        tab_grid.AddGrowableCol(1)
+        print("adding options")
+
+        txt = wx.StaticText(new_tab, wx.ID_ANY, "Overwrite Maestro View?")
+        tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        self.maestro_overwrite = wx.CheckBox(new_tab,wx.ID_ANY,"yes", style=0)
+        tab_grid.Add(self.maestro_overwrite, 0, wx.ALL | wx.EXPAND, 2)
+
+        txt = wx.StaticText(new_tab, wx.ID_ANY, "Import Schematic View?")
+        tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        txt = wx.StaticText(new_tab, wx.ID_ANY, "Overwrite Schematic View?")
+        tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        new_tab.SetSizer(tab_grid)
+        #tab_grid.Fit(new_tab)
+        #new_tab.sizer_2.Add(tab_grid, 0, wx.EXPAND, 0)
+        #new_tab.SetSizer(generate_tab.sizer_2)
+        new_tab.Layout()

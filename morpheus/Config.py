@@ -145,7 +145,15 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
             file_type_part = value[1][1:] #remove leading dot "."
             print(f"{self.name} {file_type_part} loaded from {filepath}")
 
-    
+    def updateInstance(self,OBJ):
+        for key in self.__dict__: #GO RECURSIVELY EVENTUALLY
+            defintion = self.__dict__[key]
+            if(isinstance(defintion, str)):
+                #https://stackoverflow.com/questions/28094590/ignore-str-formatfoo-if-key-doesnt-exist-in-foo
+                #s = Template(defintion).safe_substitute(**self.global_dict)
+                self.__dict__[key] = defintion.format_map(OBJ.global_dict) #update config file dict with globals
+        OBJ.__dict__.update(self.__dict__)
+        
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):
         return None 

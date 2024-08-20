@@ -22,5 +22,162 @@ class TabTemplate(wx.ScrolledWindow):
         self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
         
         # end wxGlade
+    def build(self, obj_to_tab, testbench_tabs):
+        tab_name = "test tab"
+        #new_tab = TabTemplate(testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+        testbench_tabs.AddPage(self, tab_name)
+
+        tab_grid = wx.FlexGridSizer(len(obj_to_tab.__dict__), 2, 0, 0) #Configure Notebook ta
+        tab_grid.AddGrowableCol(1)
+        print("adding props")
+        counter = 0
+        self.options = list()
+        for prop in obj_to_tab.__dict__:
+            print("prop add")
+
+            prop_val = obj_to_tab.__dict__[prop]
+            prop_val_type = type(prop_val)
+
+            new_prop = gui_option(self,tab_grid,prop,prop_val)
+            new_prop.build()
+            self.options.append(new_prop)
+            tab_grid.AddGrowableRow(counter)
+            counter = counter +1
+            #text
+            # txt = wx.StaticText(self, wx.ID_ANY, prop)
+            # tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+            # prop_val = obj_to_tab.__dict__[prop]
+            # prop_val_type = type(prop_val)
+            # #https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
+            # if prop_val_type is str:
+            #     OPTION_input = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            # elif prop_val_type is bool:
+            #     OPTION_input = wx.CheckBox(self,wx.ID_ANY,"yes", style=0)
+            # elif prop_val_type is dict:
+            #     OPTION_input = wx.CollapsiblePane(self,wx.ID_ANY,label="DICT")
+            #     for var in prop_val:
+
+            # else:
+            #     print(prop_val_type)
+            #     OPTION_input = wx.StaticText(self, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
+            # tab_grid.Add(OPTION_input, 0, wx.ALL | wx.EXPAND, 2)
+            #dropdown
+            
+        #tab_grid.Fit(new_tab)
+        self.SetSizer(tab_grid)
+        #tab_grid.Fit(new_tab)
+        #new_tab.sizer_2.Add(tab_grid, 0, wx.EXPAND, 0)
+        #new_tab.SetSizer(generate_tab.sizer_2)
+        self.Layout()
 
 # end of class TabTemplate
+class gui_option():
+    def __init__(self,parent,grid,dict_variable, value):
+        self.dict_var = dict_variable
+        self.grid = grid
+        self.parent = parent
+        self.value = value
+
+    def plan(self):
+        parent = self.parent
+        tab_grid = self.grid
+
+        prop_val = self.value
+        prop = self.dict_var
+        prop_val_type = type(prop_val)
+
+        self.txt = wx.StaticText(parent, wx.ID_ANY, prop)
+        #tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+#https://stackoverflow.com/questions/1952464/python-how-to-determine-if-an-object-is-iterable
+
+        if prop_val_type is str:
+            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        elif prop_val_type is bool:
+            self.option = wx.CheckBox(parent,wx.ID_ANY,"yes", style=0)
+        elif prop_val_type is dict or prop_val_type is list:
+
+            collpane = wx.CollapsiblePane(parent, wx.ID_ANY, "Details:");
+            self.option = collpane
+            prop_val = ["test", "hello", "world"]
+            win = collpane.GetPane();
+            paneSz = wx.BoxSizer(wx.VERTICAL);
+            new_tab_grid = wx.FlexGridSizer(len(prop_val), 2, 0, 0) #Configure Notebook ta
+            new_grid = new_tab_grid;
+            new_parent = win
+            counter = 0
+            for option in prop_val:
+                prop2 = f"{prop}[{counter}]"
+                counter= counter+1
+                prop_val = "tehllo work"
+                new_prop = gui_option(new_parent,new_grid,prop2,prop_val)
+                new_prop.build()
+
+            win.SetSizer(new_grid);
+            paneSz.SetSizeHints(win);
+        else:
+            print(prop_val_type)
+            self.option = wx.StaticText(parent, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
+
+        
+
+        
+    def build_test(self):
+        tab_grid = self.grid
+        tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        tab_grid.Add(self.option, 0, wx.GROW|wx.ALL, 2)
+    def build(self):
+        parent = self.parent
+        tab_grid = self.grid
+
+        prop_val = self.value
+        prop = self.dict_var
+        prop_val_type = type(prop_val)
+
+        self.txt = wx.StaticText(parent, wx.ID_ANY, prop)
+        tab_grid.Add(self.txt, 1, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+#https://stackoverflow.com/questions/1952464/python-how-to-determine-if-an-object-is-iterable
+
+        if prop_val_type is str:
+            self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        elif prop_val_type is bool:
+            self.option = wx.CheckBox(parent,wx.ID_ANY,"yes", style=0)
+        elif prop_val_type is dict or prop_val_type is list:
+
+            collpane = wx.CollapsiblePane(parent, wx.ID_ANY, "Details:");
+            self.option = collpane
+            prop_val = ["test", "hello", "world"]
+            win = collpane.GetPane();
+            paneSz = wx.BoxSizer(wx.VERTICAL);
+            new_tab_grid = wx.FlexGridSizer(len(prop_val), 2, 0, 0) #Configure Notebook ta
+            new_grid = new_tab_grid;
+            new_parent = win
+            counter = 0
+            for option in prop_val:
+                prop2 = f"{prop}[{counter}]"
+                counter= counter+1
+                prop_val = "tehllo work"
+                new_prop = gui_option(new_parent,new_grid,prop2,prop_val)
+                new_prop.build()
+            #paneSz.Add(wx.StaticText(win, wx.ID_ANY, "test!"), 1, wx.GROW|wx.ALL, 2);
+            
+            win.SetSizer(new_grid);
+            paneSz.SetSizeHints(win);
+            #tab_grid.Add(collpane, 0, wx.GROW|wx.ALL, 5);
+            #self.option = wx.ComboBox(parent, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            # self.option = wx.CollapsiblePane(parent,wx.ID_ANY,label="DICT/LIST")
+            # new_grid = wx.FlexGridSizer(len(prop_val), 2, 0, 0) #Configure Notebook ta
+            # new_parent = self.option.GetPane()
+            # for option in prop_val:
+            #     if(type(option) is str):
+            #         print("value add" + option)
+            #     prop = "test"
+            #     prop_val = option
+            #     new_prop = gui_option(new_parent,new_grid,prop,prop_val)
+        else:
+            print(prop_val_type)
+            self.option = wx.StaticText(parent, wx.ID_ANY, str(prop_val_type) + " Type Not Supported")
+
+        
+
+        tab_grid.Add(self.option, 0, wx.GROW|wx.ALL, 2)
+    

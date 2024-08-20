@@ -2,24 +2,29 @@ from morpheus.Config import *
 from morpheus.Schematic import *
 
 class maestro:
-    def __init__(self,ws,lib,cell,view,DUT,config, build = False) -> None:
-        self.build = build #temp
-        self.DUT = DUT
+    def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
         self.ws = ws
         self.lib = lib
-        self.cell =cell
-        self.view =view
+        self.config = config
+        self.global_dict = global_dict
+
+        #DEFAULTS
+        self.build = False
+        self.cell = "Morpheus_Testbench"
+        self.view = "maestro"
+
+        self.overwrite_maestro = False
+        self.overwrite_schematic = False
+        self.schematics = dict()
+
         self.equationDict = {
             "DUT" : "DUT" #test.schem.DUT.name
         }
 
+        config.updateInstance(self)
+
+        #self.options = [self.overwrite_maestro,self.overwrite_schematic]
         
-        #TODO MAKE SURE TO CLOSE ON ANY ERROR. Otherwise data is lost.
-        self.schematics = dict()
-        self.config = config
-        #if(self.config):
-        #    schem = self.getSchematic(self.config) #TODO should run in create test not before
-            #self.createTest(config,schem)
         if(self.build):
             self.open() #TODO delete? become part of GUI Handler 
             self.createTests() #build everything
@@ -37,22 +42,17 @@ class maestro:
     def getSchematic(self,testConfig):
         schem = self.schematics.get(testConfig.schematic)
         if(schem is None): #schematic doesnt already exist in dictionary
-            #sconfig = config("{filename}".format(filename = test.schematic),config_types.SCHEMATIC)
             sconfig = config(testConfig.schematic,config_types.SCHEMATIC)#find the config file for the schematic
             
             #FIX!!!!!!!!!
             sconfig.cell = self.cell#TODO
-            sconfig.name = "schematic" #MUST FIX!
 
-            schem = schematic(self.ws,self.lib,self.DUT,sconfig,testConfig)#check if exists as well
+            schem = schematic(self.ws, sconfig, self.lib,self.global_dict)#check if exists as well
             if(self.build): #build (even if overwriting) in build mode
                 schem.plan()
                 schem.build()
             self.schematics.update({testConfig.schematic:schem})
         return schem
-    
-    #def getConfig(self,testConfig):
-
 
     def createConfig(self,Config):
         config_view = self.ws.hdb.Open(self.lib, self.cell, "config_" + Config.name, "a", "CDBA")
@@ -66,8 +66,6 @@ class maestro:
     def createTests(self):
         #SINGLE TEST
         if not hasattr(self.config, "tests"): #TODO not this. I don't like this.
-            #schem = self.getSchematic(self.config)
-            #setattr(self.config,"schem",schem)
             self.createDictFromSchem(self.config)
             self.createTest(self.config) 
         else: #MULTITEST TODO
@@ -137,10 +135,6 @@ class maestro:
         for equation in test.equations:
             self.createEquation(test, equation)
     def createEquation(self, test, equation):
-        #creates equation for all of same type
-        #if hasattr(equation,"type"):
-        #    self.createEquDict(test,equation)
-        #if type is an array then sweep those values but for now assume 1 sweeping pin type.
         if(self.equationDict.get(equation.type) is not None):
             for pin in self.equationDict.get(equation.type):#TODO MOVE FOR LOOP TO CREATE EQUATIONS?!?!
                 tempDict = self.equationDict.copy() #MAKE COPY
@@ -199,9 +193,6 @@ class maestro:
 
     def createDictFromSchem(self,test): #auto run after loading schem
         schematic = self.getSchematic(test)
-        #add pintypes
-        #Error in finding DUT inst despite building?
-        #schematic.findDUT() #cant run without error
         self.equationDict.update({"DUT":schematic.DUTname}) #add linked varriables
 
         for pin in schematic.evaluatedPins:
@@ -235,3 +226,19 @@ class maestro:
         self.ws.mae.SaveSetup(session = self.session)
         self.ws.mae.CloseSession(session = self.session)
 
+    def gui_setup(self):
+
+        type_dict = {
+            "string":str,
+            "int":int
+        }
+        
+        options = list()
+        for variable in self.varaibles:
+
+            type_of_var = type_dict[variable.type]
+            #gui_option()
+
+        self.options= {
+            
+        }

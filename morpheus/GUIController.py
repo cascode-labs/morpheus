@@ -3,6 +3,7 @@ from morpheus.Exceptions.ExceptionHandler import MorpheusExceptionHandler
 from skillbridge import Workspace
 from morpheus.Config import config, config_types
 from morpheus.Maestro import maestro
+from morpheus.Schematic import schematic
 from morpheus.GUIViewer import *
 from morpheus.TabTemplate import TabTemplate
 import wx
@@ -23,14 +24,12 @@ class GUIController():
 
         self.testPins = []
         self.schems = []
-        #print("id is ", self.id)
         self.ws = ws
-        #try:
-        #    print("create ws")
-       #     self.ws = Workspace.open(self.id) #open skillbridge
-        #except Exception as e:
-        #    print("failed to create ws")
-        #    self.error(e)
+
+            #DEBUGING TEMP
+            # __init__(self,ws,config,lib, global_dict = dict()) -> None:
+        #self.maestro = maestro(ws,"default_lib")
+        #self.schematic_test = schematic(ws,"")
 
 
     def startGUI(self):
@@ -42,8 +41,15 @@ class GUIController():
         self.GUIframe.Show()
 
         self.setBindings() # Initiate Bindings
-        self.populateLibraries() # Populate Library drop down menu
+        #self.populateLibraries() # Populate Library drop down menu
         self.populateTests()
+        self.GUIframe.Size = (600,800)
+        config.getPaths()
+        self.openNewTab(Config.config.userConfig)
+        #self.openNewTab(self.maestro)
+        #self.openNewTab(self.schematic_test)
+        self.GUIframe.testbench_tabs.Show()
+
 
         self.MorpheusApp.MainLoop() # Start Main Loop
 
@@ -51,17 +57,23 @@ class GUIController():
     def setBindings(self):
 
         '''Function to handle the bindings of every element on the GUI'''
-        self.GUIframe.sel_dut_lib.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.populateCells)
-        self.GUIframe.btn_reeval.Bind(wx.EVT_BUTTON, self.reevaluate)
-        self.GUIframe.btn_mktest.Bind(wx.EVT_BUTTON, self.createTest)
-        self.GUIframe.sel_test.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.loadTest)
-        
+        #self.GUIframe.lib_sel.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.populateCells)
+        #self.GUIframe.btn_reeval.Bind(wx.EVT_BUTTON, self.reevaluate)
+        #self.GUIframe.btn_mktest.Bind(wx.EVT_BUTTON, self.createTest)
+        #self.GUIframe.sel_test.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.loadTest)
+        self.GUIframe.config_sel.Bind(wx.EVT_COMBOBOX,self.loadTest)
         ### If more buttons are added, their bindings should be added here unless in notebook pane
     def loadTest(self,e):
-        sel = self.GUIframe.sel_test.GetSelection() #Gets current combo box selection
-
+        #create blank maestro view
+        
+        sel = self.GUIframe.config_sel.GetSelection() #Gets current combo box selection
+        
         if sel != -1:  # Makes sure combo box is not empty
-            selectectConfig = self.configs[self.GUIframe.sel_test.GetSelection()] #Gets library from given selection index
+            selectectConfig = self.configs[self.GUIframe.config_sel.GetSelection()] #get config file from loaded files (or just load file)
+            self.maestro = maestro(self.ws,selectectConfig)
+            self.maestro.gui_setup()
+            self.openNewTab(self.maestro)
+
             #new_config = config(filepath=selectedTest)
             #for var in new_config.variables:
             self.addVariables(selectectConfig)
@@ -71,12 +83,35 @@ class GUIController():
             #    self.cellList = [cell.name for cell in lID.cells] #Populates a list of available cell views
             #    self.GUIframe.sel_dut_cell.SetItems(self.cellList) #Updates combo box drop down menu
 
+    def openNewTab(self, obj_to_tab):
 
+        tab_name = "test tab"
+        new_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+        new_tab.build(obj_to_tab,self.GUIframe.testbench_tabs)
+
+        # self.GUIframe.testbench_tabs.AddPage(new_tab, tab_name)
+
+        # tab_grid = wx.FlexGridSizer(len(obj_to_tab.__dict__), 2, 0, 0) #Configure Notebook tab
+        # tab_grid.AddGrowableCol(1)
+        # print("adding props")
+        # for prop in obj_to_tab.__dict__:
+        #     print("prop add")
+        #     #text
+        #     txt = wx.StaticText(new_tab, wx.ID_ANY, prop)
+        #     tab_grid.Add(txt, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
+        #     #dropdown
+        #     sel = wx.ComboBox(new_tab, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        #     tab_grid.Add(sel, 0, wx.ALL | wx.EXPAND, 2)
+
+        # new_tab.SetSizer(tab_grid)
+
+        # new_tab.Layout()
+    
     def addVariables(self,config):
         self.GUIframe.testbench_tabs.Show() #Unhide Notebook view
         variables = config.variables
 
-        device_sel_grid = wx.FlexGridSizer(len(variables), 2, 0, 0) #Configure Notebook tab
+        device_sel_grid = wx.FlexGridSizer(len(variables), 2, 1, 0) #Configure Notebook tab
         device_sel_grid.AddGrowableCol(1)
         self.GUIframe.Size = (600,800)
 
@@ -92,7 +127,7 @@ class GUIController():
            # if pin.type:
             #pinSelect.SetSelection(pinSelect.FindString(pin.type)) #Set Default combobox value to predetermined pin type, or leave blank
             device_sel_grid.Add(pinSelect, 0, wx.ALL | wx.EXPAND, 2)
-
+        self.GUIframe.SetSizer(self.body)
             #pinSelect.Bind(wx.EVT_COMBOBOX_CLOSEUP,self.updateTerminal) #Set Combobox binding for updating pins
     def populateTests(self):
         files = config.searchFiles(file_type=config_types.TEST)
@@ -103,9 +138,9 @@ class GUIController():
             new_config = config(filepath=file)
             self.configs.append(new_config)
 
-        self.GUIframe.sel_test.AppendItems(files)
+        #self.GUIframe.sel_test.AppendItems(files)
         #self.GUIframe.sel_test.AppendItems(tests)
-        #self.GUIframe.configs_sel.AppendItems(tests)
+        self.GUIframe.config_sel.AppendItems(files)
 
     def populateLibraries(self):
 
