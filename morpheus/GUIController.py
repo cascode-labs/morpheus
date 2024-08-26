@@ -226,7 +226,13 @@ class GUIController():
         print("DUTLIB is {DUTLIB}".format(**self.global_dict))
         
         self.maestro = maestro(self.ws,self.config,self.lib,self.global_dict)
-        self.maestro.createTests() #replace to build
+        try:
+            self.maestro.open()
+            self.maestro.build = True
+            self.maestro.createTests() #replace to build
+        except:
+            pass
+        self.maestro.close()
         #self.maestro.build()
 
     

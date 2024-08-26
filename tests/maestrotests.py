@@ -19,7 +19,16 @@ ws = Workspace.open(id)
 
 DUT = ws.db.open_cell_view("morpheus_tests",DUT,"symbol")
 configFile = Config.config(configFile,Config.config_types.TEST)
-Testbench = maestro(ws,lib,DUT,configFile)
+global_dict = {
+    "DUTCELL":"5T_Op_Amp",
+    "DUTLIB":"morpheus_tests"
+}
+
+Testbench = maestro(ws,configFile,lib,global_dict)
+Testbench.build = True
+Testbench.open()
+Testbench.createTests()
+Testbench.close()
 #session = maeOpenSetup("morpheus_tests" "opamp_AUTO_TB" "maestro_test") 
 #maeCreateTest("firstTest" ?session session ?lib "morpheus_tests" ?cell "opamp_AUTO_TB" ?view "maestro_test")
 

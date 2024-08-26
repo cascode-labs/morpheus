@@ -4,7 +4,7 @@ type: "test"
 #scriptpath: '/PATH/TO/SKILL/SCRIPT'
 #script: "SCRIPTNAME"
 
-schematic: opamp
+
 
 dictionary_variables:
 - name: DUTLIB
@@ -30,6 +30,7 @@ variables:
 
 tests:
   - name: "TEST1"
+    schematic: opamp
     analysis:
         type: "dc"
         options: 
@@ -40,11 +41,17 @@ tests:
           - [incrType, Automatic]
     equations:
     - name: "EQUATION_1"
-      type: "vdd"
-      equation: value(IS("/V_{vdd}/MINUS") 27)
+      type: "DUT.vdd"
+      equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
+
     - name: "Open Loop Gain"
-      type: "vdd"
-      equation: value(IS("/V_{vdd}/MINUS") 27)
+      type: "DUT.vdd"
+      equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
+
+    - name: "VSS"
+      type: "DUT.vss"
+      equation: value(IS("/V_{DUT.vss[0]!s}/MINUS") 27)
+
     corners:
       - name: corner1
         vars:

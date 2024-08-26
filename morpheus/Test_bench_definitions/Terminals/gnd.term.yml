@@ -2,7 +2,7 @@
 name: "gnd"
 #type: "terminal"
 width: 0.5
-height: 1S
+height: 1.5
 Insts: 
   - name: "gnd"
     lib: "analogLib"

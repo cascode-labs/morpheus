@@ -1,5 +1,6 @@
 from morpheus.Config import *
 from morpheus.Schematic import *
+from morpheus.Formatter import moprheus_Formatter
 
 class maestro:#test
     def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
@@ -47,7 +48,7 @@ class maestro:#test
             #FIX!!!!!!!!!
             sconfig.cell = self.cell#TODO
 
-            schem = schematic(self.ws, sconfig, self.lib,self.global_dict)#check if exists as well
+            schem = schematic(self.ws, sconfig, self.lib,self.cell, self.global_dict)#check if exists as well
             if(self.build): #build (even if overwriting) in build mode
                 schem.plan()
                 schem.build()
@@ -66,12 +67,14 @@ class maestro:#test
     def createTests(self):
         #SINGLE TEST
         if not hasattr(self.config, "tests"): #TODO not this. I don't like this.
-            self.createDictFromSchem(self.config)
+            #self.createDictFromSchem(self.config)
+            #schematic = self.getSchematic(test)
             self.createTest(self.config) 
         else: #MULTITEST TODO
             for test in self.config.tests: #create all tests in the test config
-                self.createDictFromSchem(test)
-                createTest(test) 
+                #self.createDictFromSchem(test)
+                #schematic = self.getSchematic(test)
+                self.createTest(test) 
         #add variables (TODO break into new function)
         for var in self.config.variables: 
             self.ws.mae.SetVar(var.name.format(**self.equationDict),var.value,typeValue=var.test, #Attach varaibles to Maestro view
@@ -135,13 +138,40 @@ class maestro:#test
         for equation in test.equations:
             self.createEquation(test, equation)
     def createEquation(self, test, equation):
-        if(self.equationDict.get(equation.type) is not None):
-            for pin in self.equationDict.get(equation.type):#TODO MOVE FOR LOOP TO CREATE EQUATIONS?!?!
-                tempDict = self.equationDict.copy() #MAKE COPY
-                tempDict.update({equation.type:pin}) #TODO add linked varriables
-                expression = equation.equation.format(**tempDict) 
-                name = equation.name.format(**tempDict)
-                self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)#TODO CHECK IF EXISTS AND UPDATE
+        #search dictionary for type
+        string_split = equation.type.split(".")
+        dictionary_definition = self.global_dict.copy()
+        #dictionary_definition = equation.type.format(**dictionary_definition) 
+        #dictionary_definition = dictionary_definition[equation.type.format(**dictionary_definition)]
+        for string in string_split:
+            if(type(dictionary_definition) is dict):
+                dictionary_definition = dictionary_definition[string]
+            else:
+                dictionary_definition = dictionary_definition.__dict__[string]
+        for iterable in dictionary_definition:
+            
+            tempDict = self.global_dict.copy() #MAKE COPY
+            # string_split = equation.type.split(".")
+            # dictionary_definition = self.global_dict.copy()
+            # for string in string_split:
+            #     if(type(dictionary_definition) is dict):
+            #         dictionary_definition = dictionary_definition[string]
+            #     else:
+            #         dictionary_definition = dictionary_definition.__dict__[string]
+            tempDict.update({equation.type:iterable}) #TODO add linked varriables
+            #expression = equation.equation.format(**tempDict) 
+            formatter = moprheus_Formatter()
+            expression = formatter.format(equation.equation,**tempDict) 
+            name = equation.name.format(**tempDict)
+            self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)#TODO CHECK IF EXISTS AND UPDATE
+
+        # if(self.equationDict.get(equation.type) is not None):
+        #     for pin in self.equationDict.get(equation.type):#TODO MOVE FOR LOOP TO CREATE EQUATIONS?!?!
+        #         tempDict = self.global_dict.copy() #MAKE COPY
+        #         tempDict.update({equation.type:pin}) #TODO add linked varriables
+        #         expression = equation.equation.format(**tempDict) 
+        #         name = equation.name.format(**tempDict)
+        #         self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)#TODO CHECK IF EXISTS AND UPDATE
 
      #def recursiveFormat():
     def createOceanScripts(self,test):
@@ -193,7 +223,7 @@ class maestro:#test
 
     def createDictFromSchem(self,test): #auto run after loading schem
         schematic = self.getSchematic(test)
-        self.equationDict.update({"DUT":schematic.DUTname}) #add linked varriables
+        #self.equationDict.update({"DUT":schematic.DUTname}) #add linked varriables
 
         for pin in schematic.evaluatedPins:
             if pin.type is not None:

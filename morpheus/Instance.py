@@ -9,6 +9,8 @@ from morpheus import Config
 from string import Template
 from morpheus.Terminal import Terminal
 
+def ceilByInt(num, base):
+        return base * math.ceil(num/base)
 
 class FailsafeDict(dict):
     def __getitem__(self, item):
@@ -32,7 +34,8 @@ class instance:
             self.x_offset = 0;
             self.y_offset = 0;
             self.ws = ws #skillbridge
-
+    def __str__(self):
+       return self.location
 
     def loadConfig(self,config):
         for key in config.__dict__: #GO RECURSIVELY EVENTUALLY
@@ -53,24 +56,28 @@ class instance:
         #    instance.get_matches(self.inst.nets,"name", net.pattern)
         self.symbol = self.ws.db.open_cell_view(self.lib,self.cell,"symbol")
         self.terminals = list() #clear terminals
+        self.local_dict = dict()
         if(self.terminal_types is not None): #check that is not CADENCE INSTANCE OR INSTANCE WITH NO TERMINALS TO EVALUATE
             for terminal_type in self.terminal_types: #every type of terminal
                 terminal_type.matches = instance.get_matches(self.symbol.terminals,"name", terminal_type.pattern)
 
                 #if terminal_type.term =="dc2":# temp check
-
+                terminal_type_instances =list()
                 for match in terminal_type.matches: #create terminal for each match of that type
                     #if(hasattr(terminal_type,"term")): #import from config file
                     #    config = Config.config(terminal_type.term, Config.config_types.TERMINAL)#TODO REMOVE or require?
                     #else:
                     config = terminal_type
                     terminal = instance(self.ws,terminal_type,self.global_dict)
+                    
                     terminal.label = match.name
                     terminal.cadence_term = match
                     #terminal.evaluate() #Dont need to evaluate created terminals
                     self.terminals.append(terminal)
-
-                        
+                    terminal_type_instances.append(terminal)
+                setattr(self, terminal_type.name, terminal_type_instances)
+                self.local_dict.update({terminal_type.name:terminal_type_instances})#add all instances to local dict 
+            
 
                 
         print("completed elvaluation on ___")
@@ -166,8 +173,9 @@ class instance:
         oldx = self.x
         oldy = self.y
         self.cv = cv
-        self.x = instance.ceilByInt(xoffset + self.x + self.width/2 - self.x_offset,gridSize)
-        self.y = instance.ceilByInt(yoffset + self.y + self.height/2 - self.y_offset,gridSize)
+        self.x = ceilByInt(xoffset + self.x + self.width/2 - self.x_offset,gridSize)
+        self.y = ceilByInt(yoffset + self.y + self.height/2 - self.y_offset,gridSize)
+        name = None
         #TODO add special case for no connect
         if(self.term == "NOCONNECT"):
             name = self.label + "_NOCONN"
@@ -178,8 +186,8 @@ class instance:
             position = [self.x,self.y]
             rotation = "R0" #add rotate functionality
             prop = list() 
-            self.x = instance.ceilByInt(xoffset + oldx - self.x_offset,gridSize)
-            self.y = instance.ceilByInt(yoffset + oldy - self.y_offset ,gridSize)
+            self.x = ceilByInt(xoffset + oldx - self.x_offset,gridSize)
+            self.y = ceilByInt(yoffset + oldy - self.y_offset ,gridSize)
             position = [self.x,self.y]
             new_inst = self.ws.db.CreateParamInst(cv, self.symbol, self.name, position, rotation,1,prop) #create instance with parameters
         else:
@@ -220,15 +228,16 @@ class instance:
                     if(hasattr(inst,"rotation")):
                         rotation = "R" + str(inst.rotation)   
                     new_inst = self.ws.db.CreateParamInst(cv, symbol, name, position, rotation,1,prop) #create instance with parameters
+                    #self.location = name
 
             #end For Loop per Instance
         #end For Loop per Terminal
         self.inst = new_inst
+        self.location = name
         if(hasattr(self,"terminals")):
             for term in self.terminals:
                 self.createWireForFloatingInstPin(term)
-    def ceilByInt(num, base):
-        return base * math.ceil(num/base)
+    
     def createWireForFloatingInstPin(self,term): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(term.cadence_term.pins[0].fig.bBox, self.inst.transform)
 

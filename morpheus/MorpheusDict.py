@@ -1,0 +1,2 @@
+class morpheusDict(dict):
+    

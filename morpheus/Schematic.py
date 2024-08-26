@@ -37,7 +37,7 @@ class schematic:
         
         #load config view
         self.global_dict = global_dict
-        self.updateInstance(config)
+        config.updateInstance(self)
         
         #check if view already exists
         cvid = self.ws.dd.GetObj(self.lib,self.cell,self.view) #delete
@@ -90,6 +90,8 @@ class schematic:
         self.instances[:] = [instance(self.ws,inst,self.global_dict) for inst in self.instances]
         for inst in self.instances:
             inst.evaluate()
+            self.global_dict.update({inst.name:inst})#append to global dictionary
+            #self.global_dict.update({inst.name:inst.local_dict})#append to global dictionary
         print("Evaluated all Instances")
 
 
@@ -191,7 +193,7 @@ class schematic:
                 #layout_h =box.height + layout_h
             box.y = y
 
-            self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [ [box.x, box.y],[box.x+box.width,box.y+box.height]] )
+            #self.ws.sch.CreateNoteShape( self.cv, "rectangle", "solid", [ [box.x, box.y],[box.x+box.width,box.y+box.height]] )
 
             
             layout_h = schematic.ceilByInt(max(box.height+y,layout_h),self.gridSize)
