@@ -223,7 +223,7 @@ class GUIController():
         '''Create a new Test and Maestro View'''
         print("MAKE TEST")
         print(self.global_dict)
-        print("DUTLIB is {DUTLIB}".format(**self.global_dict))
+        #print("DUTLIB is {DUTLIB}".format(**self.global_dict))
         
         self.maestro = maestro(self.ws,self.config,self.lib,self.global_dict)
         try:
@@ -231,11 +231,46 @@ class GUIController():
             self.maestro.build = True
             self.maestro.createTests() #replace to build
         except:
+            TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)
+
+            pass
+        try:
+            self.schematic_view()
+        except:
+            
             pass
         self.maestro.close()
         #self.maestro.build()
 
-    
+    def schematic_view(self):
+        schematic_view_tab = TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)  #Create tab using the TabTemplate Class
+        schem = self.maestro.schematics[self.maestro.schematic]
+
+        tab_grid = wx.FlexGridSizer(len(schem.terminals_dict), 2, 0, 0) #Configure Notebook ta
+        tab_grid.AddGrowableCol(1)
+        for terminal in schem.terminals_dict:
+
+            new_option = gui_option(maestro_options_tab,tab_grid,self.global_dict, var.name,var.default)
+            print(f"{var.name} is type {var.type}")
+            self.global_dict[var.name] = type_dict[var.type]()
+            if(hasattr(var,"default")):
+                self.global_dict[var.name] = var.default
+            if(hasattr(var,"options")):
+                #print(eval(var.options))
+                print(self.global_dict)
+                try:
+                    new_option.global_dict = self.global_dict
+                    new_option.option_exp = var.options
+                    new_option.options = eval(var.options.format(**self.global_dict))
+                except:
+                    pass
+            new_option.plan()
+            maestro_options_tab.options.append(new_option)
+        maestro_options_tab.tab_grid = tab_grid
+        maestro_options_tab.build(self.GUIframe.testbench_tabs,"maestro options")
+        self.maestro_options_tab = maestro_options_tab
+
+
     #TODO Modify so the bulk of the "re-evaluation" function takes place within the Schematic file
     def reevaluate(self,e):
 

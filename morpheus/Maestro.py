@@ -2,7 +2,16 @@ from morpheus.Config import *
 from morpheus.Schematic import *
 from morpheus.Formatter import moprheus_Formatter
 
-class maestro:#test
+from morpheus.MorpheusObject import morpheusObject
+
+#List of properties to remove from save
+maestro_properties_to_remove =[
+    "ws", "session", "asi_session", #change based on cadence session
+    "equationDict", #TODO REMOVE not needed anymore
+    "config" #TDOD remove not needed anymore
+]
+
+class maestro(morpheusObject):#test
     def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
         self.ws = ws
         self.lib = lib
@@ -256,6 +265,36 @@ class maestro:#test
         self.ws.mae.SaveSetup(session = self.session)
         self.ws.mae.CloseSession(session = self.session)
 
+
+    def save(self):
+
+        state =self.__getstate__()
+
+        with open('savetesting_test0.yml', 'w') as yaml_file:
+            yaml.dump(self, yaml_file, default_flow_style=False,sort_keys=False)
+        pass
+
+    def saveMaestroAsYML(self):
+        #save TESTS
+        self.x_mainSDB = self.ws.axl.GetMainSetupDB( self.session )
+        curr_tests = self.ws.axl.GetTests(self.x_mainSDB)
+        for test in curr_tests[1]:
+            #if(type(test) == int):
+             #    continue
+
+            #save SIM OPTIONS
+            sim_options = self.ws.mae.GetSimOption(test,session = self.session)
+            #save HIGH PERFORMANCE SIM OPTIONS
+            #print()
+            #asiDisplayHighPerformanceOption(asiGetTool('spectre))
+            tool = self.ws.asi.GetTool('spectre')
+            print("test data loaded")
+            #high_sim_options = self.ws.asi.GetHighPerformanceOptionVal(self.asi_session, varName)
+            
+            
+            #save ANALYSISES
+            
+            #maeGetAnalysis
     def gui_setup(self):
 
         type_dict = {

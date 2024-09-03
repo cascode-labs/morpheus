@@ -8,6 +8,7 @@ from morpheus.Exceptions.SelectionBox import SelectionBoxException
 from morpheus import Config
 from string import Template
 from morpheus.Terminal import Terminal
+from morpheus.MorpheusObject import morpheusObject
 
 def ceilByInt(num, base):
         return base * math.ceil(num/base)
@@ -22,7 +23,7 @@ class FailsafeDict(dict):
     # end def
 # end class
 
-class instance:
+class instance(morpheusObject):
     def __init__(self, ws, config,global_dict = dict()) -> None:
             self.location = None
             self.term = None
@@ -37,6 +38,7 @@ class instance:
     def __str__(self):
        return self.location
 
+
     def loadConfig(self,config):
         for key in config.__dict__: #GO RECURSIVELY EVENTUALLY
             defintion = config.__dict__[key]
@@ -45,7 +47,9 @@ class instance:
                 #s = Template(defintion).safe_substitute(**self.global_dict)
                 config.__dict__[key] = defintion.format_map(self.global_dict) #update config file dict with globals
         self.__dict__.update(config.__dict__)
-    
+#    #designer updated type or instance after evaluation
+#     def update(self, ws, config):
+#         terminal_type in self.terminal_types
     
     def evaluate(self):
 
@@ -57,6 +61,11 @@ class instance:
         self.symbol = self.ws.db.open_cell_view(self.lib,self.cell,"symbol")
         self.terminals = list() #clear terminals
         self.local_dict = dict()
+        self.terminals_dict = dict()
+        for terminal in self.symbol.terminals:
+            self.terminals_dict.update({terminal.name: ''})
+            #TODO default to no connect if location is not set
+
         if(self.terminal_types is not None): #check that is not CADENCE INSTANCE OR INSTANCE WITH NO TERMINALS TO EVALUATE
             for terminal_type in self.terminal_types: #every type of terminal
                 terminal_type.matches = instance.get_matches(self.symbol.terminals,"name", terminal_type.pattern)
@@ -64,6 +73,7 @@ class instance:
                 #if terminal_type.term =="dc2":# temp check
                 terminal_type_instances =list()
                 for match in terminal_type.matches: #create terminal for each match of that type
+                    #TODO CHECK IF TERMINAL WAS ALREADY ASSIGNED (First come first served) TODO warn of attempted re-assignements 
                     #if(hasattr(terminal_type,"term")): #import from config file
                     #    config = Config.config(terminal_type.term, Config.config_types.TERMINAL)#TODO REMOVE or require?
                     #else:
@@ -73,9 +83,10 @@ class instance:
                     terminal.label = match.name
                     terminal.cadence_term = match
                     #terminal.evaluate() #Dont need to evaluate created terminals
+                    self.terminals_dict.update({match.name:terminal})
                     self.terminals.append(terminal)
                     terminal_type_instances.append(terminal)
-                setattr(self, terminal_type.name, terminal_type_instances)
+                #setattr(self, terminal_type.name, terminal_type_instances) #Does not make sense to add attr rather than using a specific local lookup dictionary
                 self.local_dict.update({terminal_type.name:terminal_type_instances})#add all instances to local dict 
             
 

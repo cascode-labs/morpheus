@@ -1,0 +1,1613 @@
+!!python/object:morpheus.Maestro.maestro
+lib: morpheus_tests
+config:
+  name: opamp_test
+  type: test
+  dictionary_variables:
+  - !!python/object/apply:types.SimpleNamespace
+    state: &id032
+      name: DUTLIB
+      type: string
+      default: DUTLIB
+      options: '[lib.name for lib in self.global_dict[''ws''].dd.GetLibList()]'
+  - !!python/object/apply:types.SimpleNamespace
+    state: &id033
+      name: DUTCELL
+      type: string
+      default: DUTCELL
+      options: '[cell.name for cell in self.global_dict[''ws''].dd.GetObj(''{DUTLIB}'').cells]'
+  variables:
+  - !!python/object/apply:types.SimpleNamespace
+    state: &id034
+      name: VDD
+      test:
+      - Global
+      - TEST1
+      - TEST2
+      value: -3.8
+  - !!python/object/apply:types.SimpleNamespace
+    state: &id035
+      name: VCC
+      test:
+      - Global
+      - TEST1
+      - TEST2
+      value: 3.8
+  tests:
+  - !!python/object/apply:types.SimpleNamespace
+    state: &id036
+      name: TEST1
+      schematic: opamp
+      analysis:
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          type: dc
+          options:
+          - - sweep
+            - Temperature
+          - - rangeType
+            - Start-Stop
+          - - start
+            - '-40'
+          - - stop
+            - '125'
+          - - incrType
+            - Automatic
+      equations:
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          name: EQUATION_1
+          type: DUT.vdd
+          equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          name: Open Loop Gain
+          type: DUT.vdd
+          equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          name: VSS
+          type: DUT.vss
+          equation: value(IS("/V_{DUT.vss[0]!s}/MINUS") 27)
+      corners:
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          name: corner1
+          vars:
+          - !!python/object/apply:types.SimpleNamespace
+            state:
+              name: temp
+              value: temp
+          - !!python/object/apply:types.SimpleNamespace
+            state:
+              name: temp2
+              value: temp2
+      - !!python/object/apply:types.SimpleNamespace
+        state:
+          name: corner2
+      schem: !!python/object:morpheus.Schematic.schematic
+        lib: morpheus_tests
+        config: &id029
+          name: OPAMP_Open_Loop
+          type: schematic
+          instances:
+          - location: null
+            term: null
+            global_dict: &id021 !!python/object/new:morpheus.Instance.FailsafeDict
+              dictitems:
+                DUTCELL: 5T_Op_Amp
+                DUTLIB: morpheus_tests
+            name: DUT
+            cell: 5T_Op_Amp
+            lib: morpheus_tests
+            region: 0
+            type: DUT
+            terminal_types:
+            - &id022
+              name: vss
+              type: vss
+              term: dc
+              pattern: vss|VSS
+              region: 0
+              matches: []
+            - &id023
+              name: vdd
+              type: vdd
+              term: dc
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+            - &id024
+              name: postive
+              type: postive
+              term: gnd
+              pattern: v2|VinP
+              region: 0
+              matches: []
+            - &id025
+              name: negative
+              type: negative
+              term: dc
+              pattern: v1|VinN
+              region: 0
+              matches: []
+            - &id026
+              name: output
+              type: output
+              term: res
+              pattern: vo|Vout
+              region: 0
+              parameters: &id001
+                r: 10M
+              matches: []
+            x_offset: -1
+            y_offset: -1.7875
+            terminals:
+            - location: VSS_gnd
+              term: dc
+              global_dict: &id002 !!python/object/new:morpheus.Instance.FailsafeDict
+                dictitems:
+                  DUTCELL: 5T_Op_Amp
+                  DUTLIB: morpheus_tests
+              name: DC
+              type: vss
+              pattern: vss|VSS
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VSS
+              width: 0.5
+              height: 1.5
+              Insts:
+              - &id003
+                name: vdc
+                lib: analogLib
+                instance: V_{label}
+                position:
+                - 0
+                - 0
+                parameters:
+                  vdc: '{label}'
+              - &id004
+                name: gnd
+                lib: analogLib
+                instance: '{label}_gnd'
+                position:
+                - 0
+                - -0.375
+              - &id005
+                name: wire
+                label: '{label}'
+                position:
+                - - 0
+                  - 0
+                - - 0
+                  - 0.375
+              x: 6.0625
+              y: 0.75
+            - location: VDD_gnd
+              term: dc
+              global_dict: &id006 !!python/object/new:morpheus.Instance.FailsafeDict
+                dictitems:
+                  DUTCELL: 5T_Op_Amp
+                  DUTLIB: morpheus_tests
+              name: DC
+              type: vdd
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VDD
+              width: 0.5
+              height: 1.5
+              Insts:
+              - &id007
+                name: vdc
+                lib: analogLib
+                instance: V_{label}
+                position:
+                - 0
+                - 0
+                parameters:
+                  vdc: '{label}'
+              - &id008
+                name: gnd
+                lib: analogLib
+                instance: '{label}_gnd'
+                position:
+                - 0
+                - -0.375
+              - &id009
+                name: wire
+                label: '{label}'
+                position:
+                - - 0
+                  - 0
+                - - 0
+                  - 0.375
+              x: 5.5625
+              y: 0.75
+            - location: VinP_gnd
+              term: gnd
+              global_dict: &id010 !!python/object/new:morpheus.Instance.FailsafeDict
+                dictitems:
+                  DUTCELL: 5T_Op_Amp
+                  DUTLIB: morpheus_tests
+              name: gnd
+              type: postive
+              pattern: v2|VinP
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinP
+              width: 0.5
+              height: 1.5
+              Insts:
+              - &id011
+                name: gnd
+                lib: analogLib
+                instance: '{label}_gnd'
+                position:
+                - 0
+                - -0.375
+              - &id012
+                name: wire
+                label: '{label}'
+                position:
+                - - 0
+                  - 0
+                - - 0
+                  - -0.375
+              x: 5.0625
+              y: 0.75
+            - location: VinN_gnd
+              term: dc
+              global_dict: &id013 !!python/object/new:morpheus.Instance.FailsafeDict
+                dictitems:
+                  DUTCELL: 5T_Op_Amp
+                  DUTLIB: morpheus_tests
+              name: DC
+              type: negative
+              pattern: v1|VinN
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinN
+              width: 0.5
+              height: 1.5
+              Insts:
+              - &id014
+                name: vdc
+                lib: analogLib
+                instance: V_{label}
+                position:
+                - 0
+                - 0
+                parameters:
+                  vdc: '{label}'
+              - &id015
+                name: gnd
+                lib: analogLib
+                instance: '{label}_gnd'
+                position:
+                - 0
+                - -0.375
+              - &id016
+                name: wire
+                label: '{label}'
+                position:
+                - - 0
+                  - 0
+                - - 0
+                  - 0.375
+              x: 4.5625
+              y: 0.75
+            - location: Vout_gnd
+              term: res
+              global_dict: &id017 !!python/object/new:morpheus.Instance.FailsafeDict
+                dictitems:
+                  DUTCELL: 5T_Op_Amp
+                  DUTLIB: morpheus_tests
+              name: RES
+              type: output
+              pattern: vo|Vout
+              region: 0
+              parameters: *id001
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: Vout
+              width: 0.5
+              height: 1.5
+              Insts:
+              - &id018
+                name: res
+                lib: analogLib
+                instance: '{label}_res'
+                position:
+                - 0
+                - 0
+                parameters:
+                  r: '{name}'
+              - &id019
+                name: gnd
+                lib: analogLib
+                instance: '{label}_gnd'
+                position:
+                - 0
+                - -0.375
+              - &id020
+                name: wire
+                label: '{label}'
+                position:
+                - - 0
+                  - 0
+                - - 0
+                  - 0.375
+              x: 4.0625
+              y: 0.75
+            local_dict: &id027
+              vss:
+              - location: VSS_gnd
+                term: dc
+                global_dict: *id002
+                name: DC
+                type: vss
+                pattern: vss|VSS
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VSS
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id003
+                - *id004
+                - *id005
+                x: 6.0625
+                y: 0.75
+              vdd:
+              - location: VDD_gnd
+                term: dc
+                global_dict: *id006
+                name: DC
+                type: vdd
+                pattern: vdd|vcc|VDD
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VDD
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id007
+                - *id008
+                - *id009
+                x: 5.5625
+                y: 0.75
+              postive:
+              - location: VinP_gnd
+                term: gnd
+                global_dict: *id010
+                name: gnd
+                type: postive
+                pattern: v2|VinP
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinP
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id011
+                - *id012
+                x: 5.0625
+                y: 0.75
+              negative:
+              - location: VinN_gnd
+                term: dc
+                global_dict: *id013
+                name: DC
+                type: negative
+                pattern: v1|VinN
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinN
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id014
+                - *id015
+                - *id016
+                x: 4.5625
+                y: 0.75
+              output:
+              - location: Vout_gnd
+                term: res
+                global_dict: *id017
+                name: RES
+                type: output
+                pattern: vo|Vout
+                region: 0
+                parameters: *id001
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: Vout
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id018
+                - *id019
+                - *id020
+                x: 4.0625
+                y: 0.75
+            vss:
+            - location: VSS_gnd
+              term: dc
+              global_dict: *id002
+              name: DC
+              type: vss
+              pattern: vss|VSS
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VSS
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id003
+              - *id004
+              - *id005
+              x: 6.0625
+              y: 0.75
+            vdd:
+            - location: VDD_gnd
+              term: dc
+              global_dict: *id006
+              name: DC
+              type: vdd
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VDD
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id007
+              - *id008
+              - *id009
+              x: 5.5625
+              y: 0.75
+            postive:
+            - location: VinP_gnd
+              term: gnd
+              global_dict: *id010
+              name: gnd
+              type: postive
+              pattern: v2|VinP
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinP
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id011
+              - *id012
+              x: 5.0625
+              y: 0.75
+            negative:
+            - location: VinN_gnd
+              term: dc
+              global_dict: *id013
+              name: DC
+              type: negative
+              pattern: v1|VinN
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinN
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id014
+              - *id015
+              - *id016
+              x: 4.5625
+              y: 0.75
+            output:
+            - location: Vout_gnd
+              term: res
+              global_dict: *id017
+              name: RES
+              type: output
+              pattern: vo|Vout
+              region: 0
+              parameters: *id001
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: Vout
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id018
+              - *id019
+              - *id020
+              x: 4.0625
+              y: 0.75
+            width: 3.7875
+            height: 3.3875
+            x: 1.0
+            y: 1.8125
+          cell: Morpheus_Testbench
+        cell: Morpheus_Testbench
+        view: schematic
+        region_padding: 1
+        subregion_padding: 0.2
+        terminals: &id030 {}
+        instances:
+        - location: null
+          term: null
+          global_dict: *id021
+          name: DUT
+          cell: 5T_Op_Amp
+          lib: morpheus_tests
+          region: 0
+          type: DUT
+          terminal_types:
+          - *id022
+          - *id023
+          - *id024
+          - *id025
+          - *id026
+          x_offset: -1
+          y_offset: -1.7875
+          terminals:
+          - location: VSS_gnd
+            term: dc
+            global_dict: *id002
+            name: DC
+            type: vss
+            pattern: vss|VSS
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VSS
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id003
+            - *id004
+            - *id005
+            x: 6.0625
+            y: 0.75
+          - location: VDD_gnd
+            term: dc
+            global_dict: *id006
+            name: DC
+            type: vdd
+            pattern: vdd|vcc|VDD
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VDD
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id007
+            - *id008
+            - *id009
+            x: 5.5625
+            y: 0.75
+          - location: VinP_gnd
+            term: gnd
+            global_dict: *id010
+            name: gnd
+            type: postive
+            pattern: v2|VinP
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VinP
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id011
+            - *id012
+            x: 5.0625
+            y: 0.75
+          - location: VinN_gnd
+            term: dc
+            global_dict: *id013
+            name: DC
+            type: negative
+            pattern: v1|VinN
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VinN
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id014
+            - *id015
+            - *id016
+            x: 4.5625
+            y: 0.75
+          - location: Vout_gnd
+            term: res
+            global_dict: *id017
+            name: RES
+            type: output
+            pattern: vo|Vout
+            region: 0
+            parameters: *id001
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: Vout
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id018
+            - *id019
+            - *id020
+            x: 4.0625
+            y: 0.75
+          local_dict: *id027
+          vss:
+          - location: VSS_gnd
+            term: dc
+            global_dict: *id002
+            name: DC
+            type: vss
+            pattern: vss|VSS
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VSS
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id003
+            - *id004
+            - *id005
+            x: 6.0625
+            y: 0.75
+          vdd:
+          - location: VDD_gnd
+            term: dc
+            global_dict: *id006
+            name: DC
+            type: vdd
+            pattern: vdd|vcc|VDD
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VDD
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id007
+            - *id008
+            - *id009
+            x: 5.5625
+            y: 0.75
+          postive:
+          - location: VinP_gnd
+            term: gnd
+            global_dict: *id010
+            name: gnd
+            type: postive
+            pattern: v2|VinP
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VinP
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id011
+            - *id012
+            x: 5.0625
+            y: 0.75
+          negative:
+          - location: VinN_gnd
+            term: dc
+            global_dict: *id013
+            name: DC
+            type: negative
+            pattern: v1|VinN
+            region: 0
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: VinN
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id014
+            - *id015
+            - *id016
+            x: 4.5625
+            y: 0.75
+          output:
+          - location: Vout_gnd
+            term: res
+            global_dict: *id017
+            name: RES
+            type: output
+            pattern: vo|Vout
+            region: 0
+            parameters: *id001
+            matches: []
+            x_offset: 0
+            y_offset: 0
+            label: Vout
+            width: 0.5
+            height: 1.5
+            Insts:
+            - *id018
+            - *id019
+            - *id020
+            x: 4.0625
+            y: 0.75
+          width: 3.7875
+          height: 3.3875
+          x: 1.0
+          y: 1.8125
+        gridSize: 0.0625
+        global_dict: &id028
+          DUTCELL: 5T_Op_Amp
+          DUTLIB: morpheus_tests
+          DUT:
+            location: null
+            term: null
+            global_dict: *id021
+            name: DUT
+            cell: 5T_Op_Amp
+            lib: morpheus_tests
+            region: 0
+            type: DUT
+            terminal_types:
+            - *id022
+            - *id023
+            - *id024
+            - *id025
+            - *id026
+            x_offset: -1
+            y_offset: -1.7875
+            terminals:
+            - location: VSS_gnd
+              term: dc
+              global_dict: *id002
+              name: DC
+              type: vss
+              pattern: vss|VSS
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VSS
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id003
+              - *id004
+              - *id005
+              x: 6.0625
+              y: 0.75
+            - location: VDD_gnd
+              term: dc
+              global_dict: *id006
+              name: DC
+              type: vdd
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VDD
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id007
+              - *id008
+              - *id009
+              x: 5.5625
+              y: 0.75
+            - location: VinP_gnd
+              term: gnd
+              global_dict: *id010
+              name: gnd
+              type: postive
+              pattern: v2|VinP
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinP
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id011
+              - *id012
+              x: 5.0625
+              y: 0.75
+            - location: VinN_gnd
+              term: dc
+              global_dict: *id013
+              name: DC
+              type: negative
+              pattern: v1|VinN
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinN
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id014
+              - *id015
+              - *id016
+              x: 4.5625
+              y: 0.75
+            - location: Vout_gnd
+              term: res
+              global_dict: *id017
+              name: RES
+              type: output
+              pattern: vo|Vout
+              region: 0
+              parameters: *id001
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: Vout
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id018
+              - *id019
+              - *id020
+              x: 4.0625
+              y: 0.75
+            local_dict: *id027
+            vss:
+            - location: VSS_gnd
+              term: dc
+              global_dict: *id002
+              name: DC
+              type: vss
+              pattern: vss|VSS
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VSS
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id003
+              - *id004
+              - *id005
+              x: 6.0625
+              y: 0.75
+            vdd:
+            - location: VDD_gnd
+              term: dc
+              global_dict: *id006
+              name: DC
+              type: vdd
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VDD
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id007
+              - *id008
+              - *id009
+              x: 5.5625
+              y: 0.75
+            postive:
+            - location: VinP_gnd
+              term: gnd
+              global_dict: *id010
+              name: gnd
+              type: postive
+              pattern: v2|VinP
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinP
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id011
+              - *id012
+              x: 5.0625
+              y: 0.75
+            negative:
+            - location: VinN_gnd
+              term: dc
+              global_dict: *id013
+              name: DC
+              type: negative
+              pattern: v1|VinN
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinN
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id014
+              - *id015
+              - *id016
+              x: 4.5625
+              y: 0.75
+            output:
+            - location: Vout_gnd
+              term: res
+              global_dict: *id017
+              name: RES
+              type: output
+              pattern: vo|Vout
+              region: 0
+              parameters: *id001
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: Vout
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id018
+              - *id019
+              - *id020
+              x: 4.0625
+              y: 0.75
+            width: 3.7875
+            height: 3.3875
+            x: 1.0
+            y: 1.8125
+        name: OPAMP_Open_Loop
+        type: schematic
+        regions:
+        - &id031
+          instances:
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: null
+              term: null
+              global_dict: *id021
+              name: DUT
+              cell: 5T_Op_Amp
+              lib: morpheus_tests
+              region: 0
+              type: DUT
+              terminal_types:
+              - *id022
+              - *id023
+              - *id024
+              - *id025
+              - *id026
+              x_offset: -1
+              y_offset: -1.7875
+              terminals:
+              - location: VSS_gnd
+                term: dc
+                global_dict: *id002
+                name: DC
+                type: vss
+                pattern: vss|VSS
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VSS
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id003
+                - *id004
+                - *id005
+                x: 6.0625
+                y: 0.75
+              - location: VDD_gnd
+                term: dc
+                global_dict: *id006
+                name: DC
+                type: vdd
+                pattern: vdd|vcc|VDD
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VDD
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id007
+                - *id008
+                - *id009
+                x: 5.5625
+                y: 0.75
+              - location: VinP_gnd
+                term: gnd
+                global_dict: *id010
+                name: gnd
+                type: postive
+                pattern: v2|VinP
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinP
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id011
+                - *id012
+                x: 5.0625
+                y: 0.75
+              - location: VinN_gnd
+                term: dc
+                global_dict: *id013
+                name: DC
+                type: negative
+                pattern: v1|VinN
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinN
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id014
+                - *id015
+                - *id016
+                x: 4.5625
+                y: 0.75
+              - location: Vout_gnd
+                term: res
+                global_dict: *id017
+                name: RES
+                type: output
+                pattern: vo|Vout
+                region: 0
+                parameters: *id001
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: Vout
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id018
+                - *id019
+                - *id020
+                x: 4.0625
+                y: 0.75
+              local_dict: *id027
+              vss:
+              - location: VSS_gnd
+                term: dc
+                global_dict: *id002
+                name: DC
+                type: vss
+                pattern: vss|VSS
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VSS
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id003
+                - *id004
+                - *id005
+                x: 6.0625
+                y: 0.75
+              vdd:
+              - location: VDD_gnd
+                term: dc
+                global_dict: *id006
+                name: DC
+                type: vdd
+                pattern: vdd|vcc|VDD
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VDD
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id007
+                - *id008
+                - *id009
+                x: 5.5625
+                y: 0.75
+              postive:
+              - location: VinP_gnd
+                term: gnd
+                global_dict: *id010
+                name: gnd
+                type: postive
+                pattern: v2|VinP
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinP
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id011
+                - *id012
+                x: 5.0625
+                y: 0.75
+              negative:
+              - location: VinN_gnd
+                term: dc
+                global_dict: *id013
+                name: DC
+                type: negative
+                pattern: v1|VinN
+                region: 0
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: VinN
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id014
+                - *id015
+                - *id016
+                x: 4.5625
+                y: 0.75
+              output:
+              - location: Vout_gnd
+                term: res
+                global_dict: *id017
+                name: RES
+                type: output
+                pattern: vo|Vout
+                region: 0
+                parameters: *id001
+                matches: []
+                x_offset: 0
+                y_offset: 0
+                label: Vout
+                width: 0.5
+                height: 1.5
+                Insts:
+                - *id018
+                - *id019
+                - *id020
+                x: 4.0625
+                y: 0.75
+              width: 3.7875
+              height: 3.3875
+              x: 1.0
+              y: 1.8125
+            width: 3.8125
+            height: 3.4375
+            x: 0
+            y: 0
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: VSS_gnd
+              term: dc
+              global_dict: *id002
+              name: DC
+              type: vss
+              pattern: vss|VSS
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VSS
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id003
+              - *id004
+              - *id005
+              x: 6.0625
+              y: 0.75
+            width: 0.5
+            height: 1.5
+            x: 5.8125
+            y: 0
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: VDD_gnd
+              term: dc
+              global_dict: *id006
+              name: DC
+              type: vdd
+              pattern: vdd|vcc|VDD
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VDD
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id007
+              - *id008
+              - *id009
+              x: 5.5625
+              y: 0.75
+            width: 0.5
+            height: 1.5
+            x: 5.3125
+            y: 0
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: VinP_gnd
+              term: gnd
+              global_dict: *id010
+              name: gnd
+              type: postive
+              pattern: v2|VinP
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinP
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id011
+              - *id012
+              x: 5.0625
+              y: 0.75
+            width: 0.5
+            height: 1.5
+            x: 4.8125
+            y: 0
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: VinN_gnd
+              term: dc
+              global_dict: *id013
+              name: DC
+              type: negative
+              pattern: v1|VinN
+              region: 0
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: VinN
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id014
+              - *id015
+              - *id016
+              x: 4.5625
+              y: 0.75
+            width: 0.5
+            height: 1.5
+            x: 4.3125
+            y: 0
+          - instances:
+            - !!python/object:morpheus.Instance.instance
+              location: Vout_gnd
+              term: res
+              global_dict: *id017
+              name: RES
+              type: output
+              pattern: vo|Vout
+              region: 0
+              parameters: *id001
+              matches: []
+              x_offset: 0
+              y_offset: 0
+              label: Vout
+              width: 0.5
+              height: 1.5
+              Insts:
+              - *id018
+              - *id019
+              - *id020
+              x: 4.0625
+              y: 0.75
+            width: 0.5
+            height: 1.5
+            x: 3.8125
+            y: 0
+          width: 7.3125
+          height: 4.4375
+          x: 0
+          y: 0
+global_dict: *id028
+build: true
+cell: Morpheus_Testbench
+view: maestro
+overwrite_maestro: false
+overwrite_schematic: false
+schematics:
+  opamp:
+    lib: morpheus_tests
+    config: *id029
+    cell: Morpheus_Testbench
+    view: schematic
+    region_padding: 1
+    subregion_padding: 0.2
+    terminals: *id030
+    instances:
+    - location: null
+      term: null
+      global_dict: *id021
+      name: DUT
+      cell: 5T_Op_Amp
+      lib: morpheus_tests
+      region: 0
+      type: DUT
+      terminal_types:
+      - *id022
+      - *id023
+      - *id024
+      - *id025
+      - *id026
+      x_offset: -1
+      y_offset: -1.7875
+      terminals:
+      - location: VSS_gnd
+        term: dc
+        global_dict: *id002
+        name: DC
+        type: vss
+        pattern: vss|VSS
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VSS
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id003
+        - *id004
+        - *id005
+        x: 6.0625
+        y: 0.75
+      - location: VDD_gnd
+        term: dc
+        global_dict: *id006
+        name: DC
+        type: vdd
+        pattern: vdd|vcc|VDD
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VDD
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id007
+        - *id008
+        - *id009
+        x: 5.5625
+        y: 0.75
+      - location: VinP_gnd
+        term: gnd
+        global_dict: *id010
+        name: gnd
+        type: postive
+        pattern: v2|VinP
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VinP
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id011
+        - *id012
+        x: 5.0625
+        y: 0.75
+      - location: VinN_gnd
+        term: dc
+        global_dict: *id013
+        name: DC
+        type: negative
+        pattern: v1|VinN
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VinN
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id014
+        - *id015
+        - *id016
+        x: 4.5625
+        y: 0.75
+      - location: Vout_gnd
+        term: res
+        global_dict: *id017
+        name: RES
+        type: output
+        pattern: vo|Vout
+        region: 0
+        parameters: *id001
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: Vout
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id018
+        - *id019
+        - *id020
+        x: 4.0625
+        y: 0.75
+      local_dict: *id027
+      vss:
+      - location: VSS_gnd
+        term: dc
+        global_dict: *id002
+        name: DC
+        type: vss
+        pattern: vss|VSS
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VSS
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id003
+        - *id004
+        - *id005
+        x: 6.0625
+        y: 0.75
+      vdd:
+      - location: VDD_gnd
+        term: dc
+        global_dict: *id006
+        name: DC
+        type: vdd
+        pattern: vdd|vcc|VDD
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VDD
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id007
+        - *id008
+        - *id009
+        x: 5.5625
+        y: 0.75
+      postive:
+      - location: VinP_gnd
+        term: gnd
+        global_dict: *id010
+        name: gnd
+        type: postive
+        pattern: v2|VinP
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VinP
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id011
+        - *id012
+        x: 5.0625
+        y: 0.75
+      negative:
+      - location: VinN_gnd
+        term: dc
+        global_dict: *id013
+        name: DC
+        type: negative
+        pattern: v1|VinN
+        region: 0
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: VinN
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id014
+        - *id015
+        - *id016
+        x: 4.5625
+        y: 0.75
+      output:
+      - location: Vout_gnd
+        term: res
+        global_dict: *id017
+        name: RES
+        type: output
+        pattern: vo|Vout
+        region: 0
+        parameters: *id001
+        matches: []
+        x_offset: 0
+        y_offset: 0
+        label: Vout
+        width: 0.5
+        height: 1.5
+        Insts:
+        - *id018
+        - *id019
+        - *id020
+        x: 4.0625
+        y: 0.75
+      width: 3.7875
+      height: 3.3875
+      x: 1.0
+      y: 1.8125
+    gridSize: 0.0625
+    global_dict: *id028
+    name: OPAMP_Open_Loop
+    type: schematic
+    regions:
+    - *id031
+equationDict:
+  DUT: DUT
+name: opamp_test
+type: test
+dictionary_variables:
+- *id032
+- *id033
+variables:
+- *id034
+- *id035
+tests:
+- *id036
+session: fnxSession18
+x_mainSDB: 1656

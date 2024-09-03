@@ -39,7 +39,7 @@ instances:
     - name: "output"
       type: "output"
       term: "res"
-      pattern: "vo|Vout"
+      pattern: "bfd" #"vo|Vout"
       region: 0
       parameters:
         r: "10M"

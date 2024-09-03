@@ -28,6 +28,8 @@ Testbench = maestro(ws,configFile,lib,global_dict)
 Testbench.build = True
 Testbench.open()
 Testbench.createTests()
+Testbench.save()
+Testbench.saveMaestroAsYML()
 Testbench.close()
 #session = maeOpenSetup("morpheus_tests" "opamp_AUTO_TB" "maestro_test") 
 #maeCreateTest("firstTest" ?session session ?lib "morpheus_tests" ?cell "opamp_AUTO_TB" ?view "maestro_test")

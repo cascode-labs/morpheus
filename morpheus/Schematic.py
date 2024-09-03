@@ -5,6 +5,15 @@ import math
 import logging
 from morpheus.Exceptions.SelectionBox import SelectionBoxException
 
+from morpheus.MorpheusObject import morpheusObject
+
+
+properties_to_remove =[
+    "ws", "session", "asi_session", #change based on cadence session
+    "global_dict","cv",
+    "equationDict", #TODO REMOVE not needed anymore
+    "config" #TDOD remove not needed anymore
+]
 from morpheus.Terminal import Terminal
 from morpheus.Instance import instance
 logger = logging.getLogger(__name__)
@@ -18,7 +27,7 @@ class regionClass:
     def __init__(self,instances=list()) -> None:
         self.instances =instances
         pass
-class schematic:
+class schematic(morpheusObject):
 
     def __init__(self,ws,config,lib,cell, global_dict = dict()) -> None:
 
@@ -51,6 +60,7 @@ class schematic:
             #self.findDUT()#potential break if no DUT TODO fix
             ws.db.Close(self.cv)
             #check if open and give warning if so
+    
 
     def reevaluate(self, pins):
         self.evaluatedPins = pins
@@ -80,18 +90,25 @@ class schematic:
     
 
     def evaluate(self):
-        if(hasattr(self.config,"variables")):
+        if(hasattr(self.config,"dictionary_variables")):
             pass
         #match pin names to terminals defined in the PLAN section of schematic config
         #for(term in self.config.Build):
         logger.info("Starting evaulation for DUT pins")
 
         #https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
+
+
         self.instances[:] = [instance(self.ws,inst,self.global_dict) for inst in self.instances]
         for inst in self.instances:
             inst.evaluate()
             self.global_dict.update({inst.name:inst})#append to global dictionary
             #self.global_dict.update({inst.name:inst.local_dict})#append to global dictionary
+        #turn into dictionary instead of list
+        instances = self.instances
+        self.instances = dict()
+        for inst in instances:
+            self.instances.update({inst.name : inst})
         print("Evaluated all Instances")
 
 
