@@ -194,7 +194,7 @@ def main(morph_args: list | None = None):
         #cadence_process = multiprocessing.Process(target=start_cadence_manager, args=(id,))
         #cadence_process.start()
 
-        manager = cadenceManager(id)
+        manager = cadenceManager(id) #TODO add unix option for precommand
         attempts = 0
 
         while attempts < 10: #Use other form of checking server other than a failure
