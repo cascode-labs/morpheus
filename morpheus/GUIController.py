@@ -1,4 +1,4 @@
-from morpheus.Exceptions.ExceptionHandler import MorpheusExceptionHandler
+#from morpheus.Exceptions.ExceptionHandler import MorpheusExceptionHandler
 
 from skillbridge import Workspace
 from morpheus.Config import config, config_types
@@ -12,9 +12,9 @@ from morpheus import Config
 
 
 class GUIController():
-    MorpheusExceptionHandler()
+    #MorpheusExceptionHandler()
     def __init__(self, ws) -> None:
-        self.MEH =  MorpheusExceptionHandler()
+        #self.MEH =  MorpheusExceptionHandler()
 
         self.MorpheusApp = wx.App()
         self.GUIframe = GUIViewer(None,wx.ID_ANY, "")

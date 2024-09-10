@@ -11,13 +11,6 @@ class morpheusObject:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        #del state['ws']
-        #del state['schematics']
-        #del state['asi_session']
-        #del state['tests']
-        #del state['dictionary_variables']
-        #del state['global_dict']
-        #del state['config']
         local_properties_to_remove = list()
         for prop in state:
             if(type(state[prop]) == RemoteObject):

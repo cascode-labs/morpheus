@@ -11,17 +11,17 @@ from morpheus import *
 
 id = "test"
 lib = "morpheus_tests"
-DUT = "5T_Op_Amp"
+DUT = "opamp"
 configFile = "opamp"
 tconfig = None
 
 ws = Workspace.open(id)
 
-DUT = ws.db.open_cell_view("morpheus_tests",DUT,"symbol")
+DUT = ws.db.open_cell_view("morpheus_examples",DUT,"symbol")
 configFile = Config.config(configFile,Config.config_types.TEST)
 global_dict = {
-    "DUTCELL":"5T_Op_Amp",
-    "DUTLIB":"morpheus_tests"
+    "DUTCELL":"opamp",
+    "DUTLIB":"morpheus_examples"
 }
 
 Testbench = maestro(ws,configFile,lib,global_dict)

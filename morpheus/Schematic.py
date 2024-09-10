@@ -3,9 +3,10 @@ import re
 import copy
 import math
 import logging
-from morpheus.Exceptions.SelectionBox import SelectionBoxException
+#from morpheus.Exceptions.SelectionBox import SelectionBoxException
 
 from morpheus.MorpheusObject import morpheusObject
+from morpheus.MorpheusDict import morpheusDict
 
 
 properties_to_remove =[
@@ -14,7 +15,7 @@ properties_to_remove =[
     "equationDict", #TODO REMOVE not needed anymore
     "config" #TDOD remove not needed anymore
 ]
-from morpheus.Terminal import Terminal
+
 from morpheus.Instance import instance
 logger = logging.getLogger(__name__)
 
@@ -27,9 +28,25 @@ class regionClass:
     def __init__(self,instances=list()) -> None:
         self.instances =instances
         pass
+
+#CONFIG view for schematic (TODO should be part of scheamtic)
+class schematicConfig(morpheusObject):
+    def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
+        pass
+    def createConfig(self,Config):
+        config_view = self.ws.hdb.Open(self.lib, self.cell, "config_" + Config.name, "a", "CDBA")
+        self.ws.hdb.SetTopCellViewName(config_view, self.lib, self.cell, Config.schematic)
+        self.ws.hdb.SetDefaultLibListString(config_view, "myLib")
+        self.ws.hdb.SetDefaultViewListString(config_view, "spectre schematic veriloga")
+        self.ws.hdb.SetDefaultStopListString(config_view, "spectre")
+        self.ws.hdb.Save(config_view)
+        self.ws.hdb.Close(config_view)
+
+
+
 class schematic(morpheusObject):
 
-    def __init__(self,ws,config,lib,cell, global_dict = dict()) -> None:
+    def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
 
         self.lib =lib
         self.ws = ws
@@ -45,8 +62,9 @@ class schematic(morpheusObject):
         self.gridSize = self.ws.sch.GetEnv("schSnapSpacing") #used for snapping everything to grid
         
         #load config view
-        self.global_dict = global_dict
+        self.global_dict = morpheusDict(global_dict)
         config.updateInstance(self)
+
         
         #check if view already exists
         cvid = self.ws.dd.GetObj(self.lib,self.cell,self.view) #delete
@@ -90,21 +108,22 @@ class schematic(morpheusObject):
     
 
     def evaluate(self):
-        if(hasattr(self.config,"dictionary_variables")):
+        #ALWAYS RESET TO CONFIG?
+        self.config.updateInstance(self)
+            #https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
+        self.instances[:] = [instance(self.ws,inst,self.global_dict) for inst in self.instances]
+
+        if(hasattr(self.config,"dictionary_variables")): #TODO confirm all variables needed are provided
             pass
         #match pin names to terminals defined in the PLAN section of schematic config
         #for(term in self.config.Build):
         logger.info("Starting evaulation for DUT pins")
-
-        #https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
-
-
-        self.instances[:] = [instance(self.ws,inst,self.global_dict) for inst in self.instances]
+        #evaluation
         for inst in self.instances:
             inst.evaluate()
-            self.global_dict.update({inst.name:inst})#append to global dictionary
-            #self.global_dict.update({inst.name:inst.local_dict})#append to global dictionary
-        #turn into dictionary instead of list
+            self.global_dict.update({inst.name:inst})#append to global dictionary TODO local dictionary instead?
+        
+        #Convert list into dictionary
         instances = self.instances
         self.instances = dict()
         for inst in instances:
@@ -115,7 +134,7 @@ class schematic(morpheusObject):
     def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN TODO just pass the gridsize?
         planned_insts = list()
         #move all terminals to schematic
-        for inst in self.instances:
+        for key, inst in self.instances.items():
             planned_insts.append(inst)
             planned_insts.extend(inst.terminals) #add all instances to schematic
         

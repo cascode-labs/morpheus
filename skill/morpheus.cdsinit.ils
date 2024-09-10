@@ -10,16 +10,33 @@ let((Morpheus
 
         procedure(start_gui()
             let((USER PROJ)
+
             USER = getShellEnvVar("USER")
             PROJ = getShellEnvVar("PROJ")
             id = strcat(PROJ,"_",USER) ; ID FOR PROJECT (MAY NEED MORE FOR )
             pyStartServer(?id id) ;Need to set the id
-
-            run_command = sprintf(nil,"/rds/prod/HOTCODE/amslibs/oa614/cdsware/IDS/morpheus/latest/bin/morpheus --id %s &", id)
+            load_user_config()
+            run_command = sprintf(nil,morpheus_location,"/bin/morpheus --id %s &", id)
             RunTerminalGui(run_command "Starting Morpheus GUI")
             )
         )
+            procedure(load_user_config()
 
+                prt=infile("~/.morpheus/user.sysm.yml")
+                morpheus_location= ""
+                gets(text, prt)
+                while(text != nil
+                    pattern = pcreCompile("morpheus-location: \"(.*)\"")
+                    match = pcreExecute(pattern text)
+                    if(match == t then 
+                        morpheus_location = pcreSubstitute(pattern "\\1")
+                        )
+                
+
+                    gets(text, prt) ;get next text
+                )
+                print(morpheus_location)
+            )
         procedure(RunTerminalGui(command @optional (title "running command") "tt")
             "Opens a terminal and runs the specified command.  It will give it the specified title"
             system(strcat(
@@ -72,8 +89,10 @@ let((Morpheus
         )
     )
 
-    Morpheus = Module->New('Morpheus
-                                ?module Morpheus
-                                ?description module_description)
+
 )
+
+Morpheus = Module->New('Morpheus
+?module Morpheus
+?description module_description)
 printf("Initialized Morpheus\n")

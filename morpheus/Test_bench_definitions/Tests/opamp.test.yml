@@ -40,13 +40,10 @@ tests:
           - [stop, "125"]
           - [incrType, Automatic]
     equations:
-    - name: "EQUATION_1"
-      type: "DUT.vdd"
-      equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
 
     - name: "Open Loop Gain"
       type: "DUT.vdd"
-      equation: value(IS("/V_{DUT.vdd[0]!s}/MINUS") 27)
+      equation: value(IS("/V_{DUT.vdd}/MINUS") 27)
 
     - name: "VSS"
       type: "DUT.vss"

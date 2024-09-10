@@ -4,11 +4,12 @@ import re
 import copy
 import math
 import logging
-from morpheus.Exceptions.SelectionBox import SelectionBoxException
+#from morpheus.Exceptions.SelectionBox import SelectionBoxException
 from morpheus import Config
 from string import Template
-from morpheus.Terminal import Terminal
 from morpheus.MorpheusObject import morpheusObject
+from morpheus.Exceptions import *
+from morpheus.MorpheusDict import morpheusDict
 
 def ceilByInt(num, base):
         return base * math.ceil(num/base)
@@ -22,19 +23,20 @@ class FailsafeDict(dict):
         # end try
     # end def
 # end class
-
+cadence_instances = dict()
 class instance(morpheusObject):
     def __init__(self, ws, config,global_dict = dict()) -> None:
             self.location = None
             self.term = None
 
-            self.global_dict = FailsafeDict(global_dict)
+            self.global_dict = morpheusDict(global_dict)
 
             self.loadConfig(config)
 
             self.x_offset = 0;
             self.y_offset = 0;
             self.ws = ws #skillbridge
+            self.__dict__ = morpheusDict(self.__dict__)
     def __str__(self):
        return self.location
 
@@ -59,6 +61,11 @@ class instance(morpheusObject):
         #for terminal in self.nets:
         #    instance.get_matches(self.inst.nets,"name", net.pattern)
         self.symbol = self.ws.db.open_cell_view(self.lib,self.cell,"symbol")
+        
+        #confirm symbol exists
+        if(self.symbol is None):
+            raise CadenceNotFound(self.lib,self.cell,"symbol")
+
         self.terminals = list() #clear terminals
         self.local_dict = dict()
         self.terminals_dict = dict()
@@ -87,11 +94,15 @@ class instance(morpheusObject):
                     self.terminals.append(terminal)
                     terminal_type_instances.append(terminal)
                 #setattr(self, terminal_type.name, terminal_type_instances) #Does not make sense to add attr rather than using a specific local lookup dictionary
-                self.local_dict.update({terminal_type.name:terminal_type_instances})#add all instances to local dict 
+                if(terminal_type.type in self.global_dict.keys()): #append to list if exists already
+                    self.global_dict.update({terminal_type.type: self.global_dict[terminal_type.type] + terminal_type_instances})
+                else:
+
+                    self.global_dict.update({terminal_type.type:terminal_type_instances})#add all instances to local dict 
             
 
                 
-        print("completed elvaluation on ___")
+        print(f"completed elvaluation on {self.name}")
         # for terminal in self.terminals: # go through all terminals on device
 
         #     #import terminal config file
@@ -191,8 +202,9 @@ class instance(morpheusObject):
         if(self.term == "NOCONNECT"):
             name = self.label + "_NOCONN"
             rt =ws.db.ConcatTransform([[0,0],dir[0]],[[0,0],"R90"])
-            instance = ws.db.OpenCellViewByType("basic", "noConn", "symbol")
-            ws.db.CreateInst(cv, instance, name, dir[1][1], rt[1],1)
+            cadence_instance = ws.db.OpenCellViewByType("basic", "noConn", "symbol")
+            ws.db.CreateInst(cv, cadence_instance, name, dir[1][1], rt[1],1)
+
         elif(not hasattr(self,"Insts")):
             position = [self.x,self.y]
             rotation = "R0" #add rotate functionality
@@ -216,7 +228,7 @@ class instance(morpheusObject):
                     if(hasattr(inst,"label") and hasattr(self,"label")):
                         self.ws.sch.CreateWireLabel(cv, mywire[0], [position[0][0] + 0.0325,position[0][1] + 0.05], inst.label.format(**self.__dict__), "upperLeft", "R90", "stick", 0.0625, False)
                 else:
-                    symbol = Terminal.getInst(self.ws,inst)
+                    symbol = instance.getInst(self.ws,inst)
                     name = self.name + "_" + inst.name #TODO BETTER NAMING SYSTEM
                     if(hasattr(self,"label")):
                         name = inst.instance.format(**self.__dict__) #named based on instance and terminal label
@@ -237,8 +249,15 @@ class instance(morpheusObject):
                                 prop.append([param,"string",property])
                     rotation = "R0" #add rotate functionality
                     if(hasattr(inst,"rotation")):
-                        rotation = "R" + str(inst.rotation)   
+                        rotation = "R" + str(inst.rotation)
+                    
                     new_inst = self.ws.db.CreateParamInst(cv, symbol, name, position, rotation,1,prop) #create instance with parameters
+                    inst_num =1
+                    #confirm instance was placed, otherwise try new instance name
+                    while(new_inst is None and inst_num < 100):
+                        new_inst = self.ws.db.CreateParamInst(cv, symbol, f"{name}_{inst_num}", position, rotation,1,prop) #create instance with parameters
+                        inst_num= inst_num+1;
+                    self.name = new_inst.name
                     #self.location = name
 
             #end For Loop per Instance
@@ -248,7 +267,14 @@ class instance(morpheusObject):
         if(hasattr(self,"terminals")):
             for term in self.terminals:
                 self.createWireForFloatingInstPin(term)
-    
+    def getInst(ws,inst): #TODO use dict to load terminals only once
+        cadence_instance = cadence_instances.get(inst.name)
+ 
+        if  cadence_instance is None:
+            print("Skill loading " + inst.name)
+            cadence_instance = ws.db.OpenCellViewByType(inst.lib, inst.name, "symbol")
+            cadence_instances.update({inst.name: cadence_instance})
+        return cadence_instance
     def createWireForFloatingInstPin(self,term): #TODO fix issue with no pin wires
         instTermbBox = self.ws.db.TransformBBox(term.cadence_term.pins[0].fig.bBox, self.inst.transform)
 

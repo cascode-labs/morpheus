@@ -14,31 +14,34 @@ class morpheus_dict(dict):
 
 class moprheus_Formatter:
     def format(self, format_string, /, *args, **kwargs):
-        return self.vformat(format_string, args, kwargs)
+        return self.vformat(format_string, args, kwargs,returnlist=True)
 
-    def vformat(self, format_string, args, kwargs):
+    def vformat(self, format_string, args, kwargs,returnlist = False):
         used_args = set()
-        result, _ = self._vformat(format_string, args, kwargs, used_args, 2)
+        result, _ = self._vformat(format_string, args, kwargs, used_args, 2,returnlist=returnlist)
         self.check_unused_args(used_args, args, kwargs)
         return result
 
     def _vformat(self, format_string, args, kwargs, used_args, recursion_depth,
-                 auto_arg_index=0):
+                 auto_arg_index=0,returnlist=False):
         if recursion_depth < 0:
             raise ValueError('Max string recursion exceeded')
         result = []
+        results= [[]]
+        total_fields = []
         for literal_text, field_name, format_spec, conversion in \
                 self.parse(format_string):
 
             # output the literal text
             if literal_text:
                 result.append(literal_text)
+                self.appendToAll(results,literal_text,None)
 
             # if there's a field, output it
             if field_name is not None:
                 # this is some markup, find the object and do
                 #  the formatting
-
+                total_fields.append(field_name)
                 # handle arg indexing when empty field_names are given.
                 if field_name == '':
                     if auto_arg_index is False:
@@ -72,8 +75,30 @@ class moprheus_Formatter:
 
                 # format the object and append to the result
                 result.append(self.format_field(obj, format_spec))
+                results = self.appendToAll(results,obj,format_spec)
+        resultsbuffer = results
+        results = []
+        for result in resultsbuffer:
+            results.append(''.join(result))
+        if returnlist:
+            return [results,total_fields],auto_arg_index#''.join(result), auto_arg_index
+        else:
+            return ''.join(result), auto_arg_index
+    def appendToAll(self,results,thingtoappend,format_spec):
+        if(type(thingtoappend) is list):
+            results_before = results.copy()
+            results = []
+            for appendThing in thingtoappend:
+                for result in results_before:
+                    text = self.format_field(appendThing, format_spec)
+                    cur_result = result.copy()
+                    cur_result.append(text)
+                    results.append(cur_result)
+        else:
 
-        return ''.join(result), auto_arg_index
+            for result in results:
+                result.append(thingtoappend)
+        return results
 
 
     def get_value(self, key, args, kwargs):
@@ -129,8 +154,10 @@ class moprheus_Formatter:
         #  getattr or getitem as needed
         for is_attr, i in rest:
             if is_attr:
-                obj = getattr(obj, i)
+                try:
+                    obj = getattr(obj, i)
+                except AttributeError:
+                    obj = obj.global_dict[i]
             else:
                 obj = obj[i]
-
         return obj, first

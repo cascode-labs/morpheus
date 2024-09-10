@@ -230,13 +230,8 @@ def main(morph_args: list | None = None):
             print("Thanks for using Morpheus! Cadence with Skillbridge will be running in the background until timeout!")
             os._exit(os.EX_OK)
 print("RUNNING MORPHEUS")
-#ws["print"]("RUNNING MORPHEUS")
-def signal_handler(sig, frame):
-    print('You pressed Ctrl+C!')
-    global_ws["print"]("CNTRLC MORPHEUS DIE")
-    sys.exit(0)
 
-signal.signal(signal.SIGINT, signal_handler)
+
 
 
 

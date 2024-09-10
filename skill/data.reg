@@ -1,10 +1,9 @@
 
-DataFormat Morpheus {
-  Pattern = Morpheus.txt;
-  Default_Editor = firefox;    
-  dfII_ViewType = firefox_url; 
-  Co_Managed = Morpheus.txt master.tag prop.xx;
+DataFormat morpheus {
+  Pattern = morpheus.txt;
+  Default_Editor = morpheus;    
+  dfII_ViewType = morpheus; 
+  Co_Managed = morpheus.txt master.tag prop.xx;
 }
 
-
-Tool Morpheus {}
+Tool morpheus {}

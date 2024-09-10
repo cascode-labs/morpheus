@@ -1,48 +1,35 @@
-#import morpheus
-
-import asyncio
-from skillbridge import Workspace
 import sys
 import os.path
-parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-sys.path.append(parentddir)
-from morpheus.Schematic import schematic
-from morpheus import Config
-#sys.path.append(S
-#    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+#print(os.getcwd())
+#parentddir = os.path.abspath(os.path.pardir)
+#print(parentddir) #get the parent directory (where morpheus is)
+sys.path.append(os.getcwd())
+print(sys.path)
+from skillbridge import Workspace
 from morpheus import *
+from morpheus.Schematic import *
+from morpheus.Config import  *
+
 
 id = "test"
-lib = "morpheus_tests"
-DUT = "iopamp"
-configFile = "opamp"
-tconfig = None
-
-
-import subprocess
-from subprocess import Popen, PIPE
-
 ws = Workspace.open(id)
 
-DUT = ws.db.open_cell_view("morpheus_tests","opamp","symbol")
-try:
-    configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
-    Testbench = schematic(ws,lib,DUT,configFile, tconfig)
-    Testbench.evaluate();
-    Testbench.plan();
-    Testbench.build();
 
-except FileNotFoundError:
-    print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")
-configFile = "opamp_feedback"
 
-try:
-    configFile = Config.config(configFile,Config.config_types.SCHEMATIC)
-    Testbench = schematic(ws,lib,DUT,configFile, tconfig)
-    Testbench.evaluate();
-    Testbench.plan();
-    Testbench.build();
+lib = "morpheus_tests"
+cell = "opamp_openloop_example"
+Global_Dict = {
+    "DUTLIB":"morpheus_tests",
+    "DUTCELL":"opamp"
+    }
+configFile = "opamp"
+schematic_config = config(configFile,Config.config_types.SCHEMATIC)
 
-except FileNotFoundError:
-    print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")
-# morpheus schematic op
+#try:
+Testbench = schematic(ws, schematic_config, lib, cell, Global_Dict)
+Testbench.evaluate();
+Testbench.plan();
+Testbench.build();
+
+#except FileNotFoundError:
+ #   print("FILE NOT FOUND, SCHEMATIC NOT CREATED!")

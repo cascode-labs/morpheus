@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<setupdb version="6">maestro
+	<active>Active Setup
+		<jobcontrolmode>LSCS</jobcontrolmode>
+		<corners>
+			<corner enabled="1">_default</corner>
+		</corners>
+		<distributeoptions>
+			<parallelrun>1</parallelrun>
+		</distributeoptions>
+		<currentmode>Single Run, Sweeps and Corners</currentmode>
+	</active>
+	<history>History</history>
+</setupdb>

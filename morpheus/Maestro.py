@@ -3,7 +3,7 @@ from morpheus.Schematic import *
 from morpheus.Formatter import moprheus_Formatter
 
 from morpheus.MorpheusObject import morpheusObject
-
+from morpheus.MorpheusDict import morpheusDict
 #List of properties to remove from save
 maestro_properties_to_remove =[
     "ws", "session", "asi_session", #change based on cadence session
@@ -16,7 +16,7 @@ class maestro(morpheusObject):#test
         self.ws = ws
         self.lib = lib
         self.config = config
-        self.global_dict = global_dict
+        self.global_dict = morpheusDict(global_dict)
 
         #DEFAULTS
         self.build = False
@@ -57,7 +57,8 @@ class maestro(morpheusObject):#test
             #FIX!!!!!!!!!
             sconfig.cell = self.cell#TODO
 
-            schem = schematic(self.ws, sconfig, self.lib,self.cell, self.global_dict)#check if exists as well
+            schem = schematic(self.ws, sconfig, self.lib, self.global_dict)#check if exists as well
+            schem.cell = self.cell
             if(self.build): #build (even if overwriting) in build mode
                 schem.plan()
                 schem.build()
@@ -149,17 +150,13 @@ class maestro(morpheusObject):#test
     def createEquation(self, test, equation):
         #search dictionary for type
         string_split = equation.type.split(".")
-        dictionary_definition = self.global_dict.copy()
+        dictionary_definition = morpheusDict(self.global_dict.copy())
         #dictionary_definition = equation.type.format(**dictionary_definition) 
         #dictionary_definition = dictionary_definition[equation.type.format(**dictionary_definition)]
-        for string in string_split:
-            if(type(dictionary_definition) is dict):
-                dictionary_definition = dictionary_definition[string]
-            else:
-                dictionary_definition = dictionary_definition.__dict__[string]
-        for iterable in dictionary_definition:
+
+        # for iterable in dictionary_definition:
             
-            tempDict = self.global_dict.copy() #MAKE COPY
+        #     tempDict = self.global_dict.copy() #MAKE COPY
             # string_split = equation.type.split(".")
             # dictionary_definition = self.global_dict.copy()
             # for string in string_split:
@@ -167,12 +164,16 @@ class maestro(morpheusObject):#test
             #         dictionary_definition = dictionary_definition[string]
             #     else:
             #         dictionary_definition = dictionary_definition.__dict__[string]
-            tempDict.update({equation.type:iterable}) #TODO add linked varriables
-            #expression = equation.equation.format(**tempDict) 
-            formatter = moprheus_Formatter()
-            expression = formatter.format(equation.equation,**tempDict) 
-            name = equation.name.format(**tempDict)
-            self.ws.mae.AddOutput(name,test.name, session = self.session,expr = expression)#TODO CHECK IF EXISTS AND UPDATE
+            # tempDict.update({equation.type:iterable}) #TODO add linked varriables
+            # #expression = equation.equation.format(**tempDict) 
+            # formatter = moprheus_Formatter()
+            # expression = formatter.format(equation.equation,**tempDict) 
+            # name = equation.name.format(**tempDict)
+        formatedequations = test.schem.global_dict.formatObjStrings(equation)
+        formatedequations = self.global_dict.formatString(equation)
+
+        for equation in formatedequations:
+            self.ws.mae.AddOutput(equation.name,test.name, session = self.session,expr = equation.expression)#TODO CHECK IF EXISTS AND UPDATE
 
         # if(self.equationDict.get(equation.type) is not None):
         #     for pin in self.equationDict.get(equation.type):#TODO MOVE FOR LOOP TO CREATE EQUATIONS?!?!

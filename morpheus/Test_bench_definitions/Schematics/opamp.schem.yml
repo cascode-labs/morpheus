@@ -1,7 +1,9 @@
 name: "OPAMP_Open_Loop"
 type: "schematic"
+cell: "OPAMP_Open_Loop"
 
 instances:
+
 - name: DUT
   cell: "{DUTCELL}"
   lib: "{DUTLIB}"
@@ -9,7 +11,7 @@ instances:
   type: "DUT"
   terminal_types:
     - name: "vss"
-      type: "vss"
+      type: "vdd"
       term: "dc"
       pattern: "vss|VSS"
       region: 0
@@ -39,8 +41,7 @@ instances:
     - name: "output"
       type: "output"
       term: "res"
-      pattern: "bfd" #"vo|Vout"
+      pattern: "vo|Vout"
       region: 0
       parameters:
         r: "10M"
-
