@@ -17,7 +17,7 @@ properties_to_remove =[
 ]
 
 from morpheus.Instance import instance
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("morpheus")
 
 class box:
     def __init__(self,w,h) -> None:
@@ -92,7 +92,6 @@ class schematic(morpheusObject):
         instance = self.instances.get(inst.name)
         if  instance is None:
             logger.info("Skill loading " + inst.name)
-            print("Skill loading " + inst.name)
             instance = self.ws.db.OpenCellViewByType(inst.lib, inst.name, "symbol")
             self.instances.update({inst.name: instance})
         return instance
@@ -128,7 +127,7 @@ class schematic(morpheusObject):
         self.instances = dict()
         for inst in instances:
             self.instances.update({inst.name : inst})
-        print("Evaluated all Instances")
+        logger.info("Evaluated all Instances")
 
 
     def plan(self): #USED TO CALCULATE LOCATIONS OF TERMINALS IN PLAN TODO just pass the gridsize?
@@ -243,13 +242,10 @@ class schematic(morpheusObject):
     #place all terminals in schematic
     def build(self):
         logger.info("Start building schematic")
-        print("Building!")
-        
         self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
 
         if(self.cv is None): #TODO CREATION EXCEPTIONS
             logger.error("Cannot build schematic because schematic not found. Check if open elsewhere")
-            print("Error: Schematic not found. Check if open elsewhere")
             return
         
         for region in self.regions:

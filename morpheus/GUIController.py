@@ -9,7 +9,7 @@ from morpheus.TabTemplate import TabTemplate,gui_option
 import wx
 import os
 from morpheus import Config
-
+logger = logging.getLogger("morpheus")
 
 class GUIController():
     #MorpheusExceptionHandler()
@@ -17,7 +17,9 @@ class GUIController():
         #self.MEH =  MorpheusExceptionHandler()
 
         self.MorpheusApp = wx.App()
+        logger.info('Start GUI Viewer')
         self.GUIframe = GUIViewer(None,wx.ID_ANY, "")
+        logger.info('GUI Viewer Started!')
         self.libList = None
         self.cellList = None
         self.configs = None

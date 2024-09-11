@@ -10,6 +10,9 @@ from string import Template
 from morpheus.MorpheusObject import morpheusObject
 from morpheus.Exceptions import *
 from morpheus.MorpheusDict import morpheusDict
+logger = logging.getLogger("morpheus")
+
+
 
 def ceilByInt(num, base):
         return base * math.ceil(num/base)
@@ -101,8 +104,8 @@ class instance(morpheusObject):
                     self.global_dict.update({terminal_type.type:terminal_type_instances})#add all instances to local dict 
             
 
-                
-        print(f"completed elvaluation on {self.name}")
+        logger.info(f"completed elvaluation on {self.name}")
+
         # for terminal in self.terminals: # go through all terminals on device
 
         #     #import terminal config file
@@ -271,7 +274,7 @@ class instance(morpheusObject):
         cadence_instance = cadence_instances.get(inst.name)
  
         if  cadence_instance is None:
-            print("Skill loading " + inst.name)
+            logger.info("Skill loading " + inst.name)
             cadence_instance = ws.db.OpenCellViewByType(inst.lib, inst.name, "symbol")
             cadence_instances.update({inst.name: cadence_instance})
         return cadence_instance

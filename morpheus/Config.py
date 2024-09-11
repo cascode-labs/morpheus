@@ -57,7 +57,7 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
 
         matching_files = config.searchFiles(name=configName,file_type=file_type)
         if(len(matching_files) > 1):
-            print("WARNING MULTIPLE FILES FOUND USING", matching_files[0])
+            logger.warning(f"MULTIPLE CONFIG FILES FOUND, USING {matching_files[0]}")
         self.loadFile(matching_files[0]) 
     
     def getPaths():
@@ -83,7 +83,7 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
 
             pass
     def createUserConfig():
-        print("Creating user.sysm.yml!")
+        logger.info("Creating user.sysm.yml")
         config.userConfig = config()
         #add all default values
         config.userConfig.name= "user config"
@@ -106,18 +106,18 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
             config.userConfig.paths.append(dir);
             config.saveUserConfig();
         else:
-            print("Failed to find load user.yml, unable to add dir\n");
+            logger.error("Failed to find load user.yml, unable to add dir\n");
 
     def searchFiles(name=None,filename = None, file_type = None):
         matching_files = list()
         file_type =  config_dict_types[file_type]
         if(filename is not None):
-            print("Finding "+ filename)
+            logger.info(f"Finding {filename}")
         elif(name is not None):#TODO CHECK FILETYPE
             filename = name + "." + file_type + ".yml" #create filename
-            print("Finding "+ filename)
+            logger.info(f"Finding {filename}")
         else:
-            print("Finding configs of type" + file_type)
+            logger.info(f"Finding configs of type: {file_type}")
 
         for path in config.path_locations: #search locations 
             for root, dirs, files in os.walk(path): #into subfolders
@@ -131,7 +131,7 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
                             filepath = os.path.join(root, file)
                             matching_files.append(filepath)
         if len(matching_files) ==0:
-            print("Could not find file")
+            logger.error("Could not find file")
             raise FileNotFoundError
 
         return matching_files
@@ -143,7 +143,7 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
             self.__dict__.update(json_load)
             value = os.path.splitext(os.path.splitext(filepath)[0])
             file_type_part = value[1][1:] #remove leading dot "."
-            print(f"{self.name} {file_type_part} loaded from {filepath}")
+            logger.info(f"{self.name} {file_type_part} loaded from {filepath}")
 
     def updateInstance(self,OBJ):
         for key in self.__dict__: #GO RECURSIVELY EVENTUALLY

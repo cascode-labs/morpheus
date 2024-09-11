@@ -34,8 +34,8 @@ class morpheusObject:
     def recursiveGetState(object_to_get_state):
         state =object_to_get_state
         local_properties_to_remove = list()
-        if(hasattr(object_to_get_state,'lib')):
-                print("hello")
+        #if(hasattr(object_to_get_state,'lib')):
+       #         print("hello")
         if hasattr(object_to_get_state, '__iter__'):
             if(type(object_to_get_state) == dict):
                 for subObject in object_to_get_state:

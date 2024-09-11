@@ -22,6 +22,7 @@ from collections import defaultdict
 from morpheus.UnixOptions import UnixOptions
 from morpheus.UnixCommands import UnixCommands
 
+from morpheus import morpheus_home
 
 frozen = 'not'
 if getattr(sys, 'frozen', False):
@@ -34,16 +35,11 @@ else:
 
 # Get the directory of the script or executable
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-''' 
-print('we are', frozen, 'frozen')
-print('bundle dir is', bundle_dir)
-print('sys.argv[0] is', script_dir)
-print('sys.executable is', sys.executable)
-print('os.getcwd is', os.getcwd())
-print("os sysmte pwd", os.environ.get("PWD"))
-'''
+
 #borrowed and modified from pyinstaller
 logger = logging.getLogger(__name__)
+
+
 # This is used by the ``--debug`` option.
 class _SmartFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
@@ -137,6 +133,18 @@ def get_username():
 global_ws = None
 def main(morph_args: list | None = None):
 
+
+#setup logger
+    logging_file_location =  os.path.join(morpheus_home,'morpheus.log')
+    logging.basicConfig(filename=logging_file_location, level=logging.DEBUG) #TODO change logging settings via unix command
+#port to STDOUT
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    logger.info(f'Logging Started at {logging_file_location}')
+
     #old parser code
     parser = argparse.ArgumentParser(
                     prog='Morpheus',
@@ -161,8 +169,7 @@ def main(morph_args: list | None = None):
     
     args = parser.parse_args(morph_args[:index])
     
-    print(args.command)
-
+    logger.info(f"Command is {args.command}")
     try: #try catch should not be needed because of default values
         cell= args.cell
     except:
@@ -185,7 +192,6 @@ def main(morph_args: list | None = None):
     #create cadence instance
     manager = None
     try:
-        print(f'Attempting to connect to SkillBridge with ID {id}')
         logger.info(f'Attempting to connect to SkillBridge with ID {id}')
         ws = Workspace.open(id) #create ws in main rather than in GUI or elsewhere
         ws["print"]("Hello World! Morpheus has started!\n")
@@ -218,8 +224,8 @@ def main(morph_args: list | None = None):
             Controller = GUIController(ws)
             Controller.startGUI()
     except Exception as e:
-        print("Error in execution closing morpheus");
-        print(e)
+        logger.info("Error in execution closing morpheus");
+        logger.info(e)
     
     #TODO move to before the unix options and GUI 
     if(manager is not None): #we created a cadence instance! Keep it going with 5 minute timeout
@@ -227,9 +233,9 @@ def main(morph_args: list | None = None):
         if pid == 0 : 
             manager.loop()
         else:
-            print("Thanks for using Morpheus! Cadence with Skillbridge will be running in the background until timeout!")
+            logger.info("Thanks for using Morpheus! Cadence with Skillbridge will be running in the background until timeout!")
             os._exit(os.EX_OK)
-print("RUNNING MORPHEUS")
+
 
 
 

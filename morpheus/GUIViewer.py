@@ -9,6 +9,41 @@ import wx
 
 # begin wxGlade: extracode
 # end wxGlade
+import logging
+
+logger = logging.getLogger("morpheus")
+#import morpheus
+
+class WxTextCtrlHandler(logging.Handler):
+    def __init__(self, ctrl):
+        logging.Handler.__init__(self)
+        self.ctrl = ctrl
+
+    def emit(self, record):
+        print(record)
+        s = self.format(record) + '\n'
+        wx.CallAfter(self.ctrl.WriteText, s)
+        #TODO color and check logger setting (only display log values of type)
+
+        #self.ctrl.SetDefaultStyle(wx.TextAttr(wx.BLUE))
+        #self.ctrl.AppendText("hello\n")
+        #self.ctrl.SetDefaultStyle(wx.TextAttr(wx.NullColour))
+        #self.ctrl.AppendText("world")
+
+LEVELS = [
+    logging.DEBUG,
+    logging.INFO,
+    logging.WARNING,
+    logging.ERROR,
+    logging.CRITICAL
+]
+levels = {
+    "debug":logging.DEBUG,
+    "info": logging.INFO,
+    "warning":logging.WARNING,
+    "error":logging.ERROR,
+    "critical": logging.CRITICAL
+}
 
 from morpheus.TabTemplate import TabTemplate
 
@@ -48,12 +83,24 @@ class GUIViewer(wx.Frame):
         self.Layout()
         self.Centre()
     def build_footer(self):
-        self.footer = wx.FlexGridSizer(1, 1, 0, 0)
+        self.footer = wx.FlexGridSizer(2, 1, 0, 0)
+        #print(levels.items)
+        self.log_settings = wx.ComboBox(self.panel_main, wx.ID_ANY, choices=list(levels.keys()), style=wx.CB_DROPDOWN | wx.CB_READONLY)
+        self.footer.Add(self.log_settings, 0,  wx.LEFT | wx.RIGHT, 50)
+
         style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL
         log = wx.TextCtrl(self.panel_main, wx.ID_ANY, size=(300,100),
                           style=style)
-        self.footer.Add(log, 0, wx.ALIGN_CENTER | wx.LEFT | wx.RIGHT, 50)
-        sys.stdout=log
+        self.footer.Add(log, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 50)
+        self.footer.AddGrowableRow(1)
+        self.footer.AddGrowableCol(0)
+
+        handler = WxTextCtrlHandler(log)
+        logger.addHandler(handler)
+        FORMAT = "%(levelname)s %(message)s"
+        handler.setFormatter(logging.Formatter(FORMAT))
+        logger.setLevel(logging.DEBUG)
+        #sys.stdout=log
 
     def build_body(self):
         rows = 3

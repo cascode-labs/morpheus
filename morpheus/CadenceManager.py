@@ -31,7 +31,7 @@ class cadenceManager:
         
         
         # Run virtuoso with input from a string
-        print("start cadence at: "+ cwd)
+        logger.info(f"start cadence at: {cwd}")
         command = precommand.split() + [ ";icfb", "-nograph"]
         #virtuoso_process = subprocess.Popen(command, capture_output=True, shell=True)
         virtuoso_process = subprocess.Popen(command ,cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True) #TODO SUPPORT BOTH VIRTUOSO AND ICFB
@@ -71,7 +71,7 @@ class cadenceManager:
                 self.ws['load'](command)
                 break;
             except:
-                print("failed to start ws server. Attempting again.")
+                logger.info("failed to start ws server. Attempting again.")
                 sleep(5)
                 attempts += 1
         
@@ -82,7 +82,7 @@ class cadenceManager:
 
 
         self.ws['setstatus']()
-        print("Cadence has started")
+        logger.info("Cadence has started")
         
     def checkInactive(self):
         self.status = self.ws['checkstatus']()
@@ -93,7 +93,7 @@ class cadenceManager:
         try:
             self.ws['killcadence']()
         except:
-            print("server closed");
+            logger.info("server closed");
     def loop(self):
         while(self.status is not None):
             sleep(self.timeout)

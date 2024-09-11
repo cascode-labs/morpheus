@@ -10,6 +10,7 @@ maestro_properties_to_remove =[
     "equationDict", #TODO REMOVE not needed anymore
     "config" #TDOD remove not needed anymore
 ]
+logger = logging.getLogger("morpheus")
 
 class maestro(morpheusObject):#test
     def __init__(self,ws,config,lib="", global_dict = dict()) -> None:
@@ -94,7 +95,7 @@ class maestro(morpheusObject):#test
     def createTest(self,test):
             schem = self.getSchematic(test)
             setattr(test,"schem",schem)
-            print("create test {test}\n".format( test= test.name))
+            logger.info("create test {test}\n".format( test= test.name))
             self.ws.mae.CreateTest(test.name, session = self.session, # Create Test within Maestro
                                    lib = self.lib, cell = self.cell, view = test.schem.view)
 
@@ -204,8 +205,8 @@ class maestro(morpheusObject):#test
         self.ws["_axlOutputsSetupAddOutputByType"](widtget, "ocean", test.name)
         self.ws["describe"](form)
         form = self.ws.__['axlOutputsForm'+num]
-        print(dir(form))
-        print(form._attributes)
+        #print(dir(form))
+        #print(form._attributes)
         #widtget = self.ws.__['axlOutputsForm'+num]['axlOutputsWidget'+num]
         self.ws["_axlOutputsSetupAddOutputByType"](widtget, "ocean", test.name)
         self.ws["_axlOutputsSetupAddOutputByType(axlOutputsForm"+num+"axlOutputsForm"+num+"->"+"axlOutputsWidget" + num+ "'ocean' '"+test.name+"')"]
@@ -289,7 +290,8 @@ class maestro(morpheusObject):#test
             #print()
             #asiDisplayHighPerformanceOption(asiGetTool('spectre))
             tool = self.ws.asi.GetTool('spectre')
-            print("test data loaded")
+            logger.info("test data loaded")
+
             #high_sim_options = self.ws.asi.GetHighPerformanceOptionVal(self.asi_session, varName)
             
             
@@ -311,7 +313,7 @@ class maestro(morpheusObject):#test
             #     #s = Template(defintion).safe_substitute(**self.global_dict)
                 # self.__dict__[key] = defintion.format_map(OBJ.global_dict) #update config file dict with globals
         for var in self.dictionary_variables:
-            print(f"{var.name} is type {var.type}")
+            logger.info(f"{var.name} is type {var.type}")
             temp_dict[var.name] = type_dict[var.type]()
             if(hasattr(var,"default")):
                 temp_dict[var.name] = var.default
