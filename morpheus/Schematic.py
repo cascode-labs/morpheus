@@ -208,7 +208,8 @@ class schematic(morpheusObject):
         layout_h = 0
         ratio = 5
         x = 0
-        y = 0            
+        y = 0
+        
         self.cv = self.ws.db.OpenCellViewByType(self.lib, self.cell,self.view, "schematic", "w")
         regionbox = self.ws.sch.CreateNoteShape( self.cv, "rectangle", "dashed", [ [0, 0],[1,1]] )
         while(len(boxes) > 0):

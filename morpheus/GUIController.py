@@ -13,8 +13,14 @@ logger = logging.getLogger("morpheus")
 
 class GUIController():
     #MorpheusExceptionHandler()
-    def __init__(self, ws) -> None:
+    def __init__(self, ws,args) -> None:
         #self.MEH =  MorpheusExceptionHandler()
+        #handle args
+        #check view type
+        if args.lib != "" and args.cell != "" and args.view != "":
+            viewType= ws.dd.MapGetFileViewType(ws.dd.GetObj(args.lib, args.cell , args.view, "*"))
+            
+
 
         self.MorpheusApp = wx.App()
         logger.info('Start GUI Viewer')
@@ -229,10 +235,11 @@ class GUIController():
         
         self.maestro = maestro(self.ws,self.config,self.lib,self.global_dict)
         try:
-            self.maestro.open()
             self.maestro.build = True
+            self.maestro.open()
             self.maestro.createTests() #replace to build
-        except:
+        except Exception as e:
+            logger.error(e)
             TabTemplate(self.GUIframe.testbench_tabs, wx.ID_ANY)
 
             pass

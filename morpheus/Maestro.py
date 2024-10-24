@@ -95,7 +95,7 @@ class maestro(morpheusObject):#test
     def createTest(self,test):
             schem = self.getSchematic(test)
             setattr(test,"schem",schem)
-            logger.info("create test {test}\n".format( test= test.name))
+            logger.info(f"create test {test.name}\n")
             self.ws.mae.CreateTest(test.name, session = self.session, # Create Test within Maestro
                                    lib = self.lib, cell = self.cell, view = test.schem.view)
 
@@ -120,12 +120,15 @@ class maestro(morpheusObject):#test
             #self.ws.sev.AddExpression(self.session,"ocean","") #ocean scripts broken
             
             if(hasattr(test,"corners")): #add corners if present
+                logger.info(f"Creating Maestro corners")
                 self.createCorners(test)
                 
             if(hasattr(test,"signals")):
+                logger.info(f"Creating Maestro signals")
                 self.createSignals(test)
                 
-            if(hasattr(test,"equations")):   
+            if(hasattr(test,"equations")):
+                logger.info(f"Creating Maestro Equations")
                 self.createEquations(test)
            # if(hasattr(test,"ocean")):   
             #    self.createOceanScripts(test)
@@ -259,10 +262,14 @@ class maestro(morpheusObject):#test
         pass
     
     def open(self):
+        mode = "append" if self.build else "write"
+        logger.info(f"Opening Maestro view: ({self.lib})({self.cell})({self.view}) loaded in {mode} mode")
         if(self.build): #if build then destroy (TODO rename to clean build?)
             self.session = self.ws.mae.OpenSetup(self.lib, self.cell,self.view,mode="w") #create new maestro view and overwrite old one
         else:
             self.session = self.ws.mae.OpenSetup(self.lib, self.cell,self.view,mode="a")
+
+        logger.info(f"Opened Maestro view: ({self.lib})({self.cell})({self.view}) loaded in {mode} mode")
     def close(self):
         self.ws.mae.SaveSetup(session = self.session)
         self.ws.mae.CloseSession(session = self.session)
