@@ -4,17 +4,21 @@ from skillbridge import Workspace
 from morpheus.Config import config, config_types
 from morpheus.Maestro import maestro
 from morpheus.Schematic import schematic
-from morpheus.GUIViewer import *
+from morpheus.GUI.GUIViewer import *
 from morpheus.TabTemplate import TabTemplate,gui_option
 import wx
 import os
 from morpheus import Config
 logger = logging.getLogger("morpheus")
 
+from morpheus.GUI.libGUI import *
+from morpheus.GUI.maestroGUI import *
+from morpheus.GUI.schematicGUI import *
+
 cadence_to_morpeus_view_dictionary = {
     "lib": libGUIPanel,
-    "maestro": maestro,
-    "schematic":schematic
+    "maestro": maestroGUIPanel,
+    "schematic":schematicGUIPanel
 }
 
 class GUIController():
@@ -29,16 +33,22 @@ class GUIController():
 
         #handle args
         #check view type
+        self.viewType = "lib"
         if args.lib != "" and args.cell != "" and args.view != "":
-            self.viewType= ws.dd.MapGetFileViewType(ws.dd.GetObj(args.lib, args.cell , args.view, "*"))
+            self.viewType = ws.dd.MapGetFileViewType(ws.dd.GetObj(args.lib, args.cell , args.view, "*"))
             #self.GUIframe.header = 
             #call specific GUI for view
             #cadence_to_morpeus_view_dictionary[viewType].gui_setup()
         else:
-            self.viewType = "lib"
             #use lib view
+            self.viewType="lib"
             pass
+        #cadence_to_morpeus_view_dictionary[self.viewType].build()
+        logger.info(f'loaded View type: {self.viewType}')
+        self.viewPanel = cadence_to_morpeus_view_dictionary[self.viewType](self,self.GUIframe.panel_main)
+        self.viewPanel.build()
 
+        self.GUIframe.build(self.viewPanel)
         logger.info('GUI Viewer Started!')
         self.libList = None
         self.cellList = None

@@ -11,7 +11,7 @@ import sys
 
 
 #from morpheus import UnixOptions
-from morpheus.GUIController import *
+from morpheus.GUI.GUIController import *
 from morpheus.Schematic import *
 
 
@@ -221,7 +221,7 @@ def main(morph_args: list | None = None):
             
             logger.info('Starting GUI')
             config.getPaths()#Get paths for tests
-            Controller = GUIController(ws)
+            Controller = GUIController(ws,args)
             Controller.startGUI()
     except Exception as e:
         logger.info("Error in execution closing morpheus");
@@ -240,7 +240,7 @@ def main(morph_args: list | None = None):
 
 
 
-
+Config.config.add_plugins()
 main()
 
 

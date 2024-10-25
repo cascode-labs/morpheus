@@ -99,7 +99,16 @@ class config:   #yaml_tag = u"!Nokia" https://stackoverflow.com/questions/645879
         os.makedirs(os.path.dirname(filename), exist_ok=True) #create morpheus directory if not already
         with open(filename, 'w') as outfile:
             yaml.dump(config.userConfig, outfile, default_flow_style=False)#,transform=strip_python_tags)
+    def add_plugins():
+        import sys
+        import importlib.util
 
+        file_path = 'plugins/schematic_lister.py'
+        module_name = 'schematic_lister'
+
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
     def addDir(dir):
         config.loadUserConfig();
         if(config.userConfig.success):
